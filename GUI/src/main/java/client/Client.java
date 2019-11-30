@@ -1,9 +1,7 @@
 package client;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class Client {
@@ -15,5 +13,10 @@ public class Client {
 		socket = new Socket( "localhost", 50000 );
 		this.in = new Scanner( socket.getInputStream() );
 		this.out = new PrintWriter( socket.getOutputStream() );;
+	}
+	public String SendCom( String command ) {
+		out.println(command); out.flush();
+		String ret = in.nextLine(); 
+		return ret;
 	}
 }
