@@ -9,6 +9,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -25,6 +26,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class GUI {
@@ -156,10 +158,70 @@ public class GUI {
 		GUI.this.setFrame(one);
 	}
 	
-	/*public class SecondPanel extends JPanel implements ActionListener{
-		
-		public SecondPanel() {
+	public class SecondPanel extends JPanel implements ActionListener{
+		JButton pass;
+		JButton surr;
+		int width;
+		int height;
+		public SecondPanel(int size) {
+			//setBackground(Color.black);
+			/*switch(size) {
+			case 9:
+				setMinimumSize(new Dimension(250, 300));
+				width = 150;
+				height = 400;
+				break;
+			case 13:
+				setPreferredSize(new Dimension(290, 560));
+				width = 290;
+				height = 560;
+				break;
+			case 19:
+				setPreferredSize(new Dimension(450, 800));
+				width = 450;
+				height = 800;
+			}*/
 			setLayout(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+			JLabel kogotura = new JLabel("Tura przeciwnika");
+			//kogotura.setPreferredSize(new Dimension(width, (int)0.25*height));
+			
+			JLabel kogotura2 = new JLabel("Twoja tura");
+			//kogotura2.setPreferredSize(new Dimension(width, (int)0.25*height));
+			
+			JLabel jency = new JLabel("Ilosc jencow");
+			//jency.setPreferredSize(new Dimension(width, (int)0.25*height));
+			
+			c.gridx = 0;
+			c.gridy = 0;
+			c.fill = GridBagConstraints.HORIZONTAL;
+			add(kogotura, c);
+			
+			c.gridx = 0;
+			c.gridy = 1;
+			c.fill = GridBagConstraints.HORIZONTAL;
+			add(kogotura2, c);
+			
+			c.gridx = 0;
+			c.gridy = 2;
+			c.fill = GridBagConstraints.HORIZONTAL;
+			add(jency, c);
+			
+			pass = new JButton("Spasuj");
+			//pass.setPreferredSize(new Dimension((int)0.5*width, (int)0.25*height));
+			
+			surr = new JButton("Poddaj się");
+			//surr.setPreferredSize(new Dimension((int)0.5*width, (int)0.25*height));
+			
+			c.gridx = 0;
+			c.gridy = 3;
+			add(pass, c);
+			
+			c.gridx = 1;
+			c.gridy = 3;
+			add(surr, c);
+			
+			
 			//kogo tura
 			//ilosc jencow
 			//przycisk pass
@@ -167,7 +229,21 @@ public class GUI {
 		}
 		
 		
-	}*/
+		public void actionPerformed(ActionEvent e) {
+			//sprawdzaj ktory gracz gra, dodawaj do dwoch roznych list
+			Object source = e.getSource();
+			if(source == pass) {
+				//wyslij klientem
+			}
+			else if(source == surr) {
+				//wyslij klientem
+			}
+			
+			
+		}
+		
+		
+	}
 	
 	
 	
@@ -203,18 +279,12 @@ public class GUI {
 			switch(this.dim) {
 				case 9:
 					this.setPreferredSize(new Dimension(400, 400));
-					//this.height = 550;
-					//this.width = 550;
 					break;
 				case 13:
 					this.setPreferredSize(new Dimension(560, 560));
-					//this.height = 750;
-					//this.width = 750;
 					break;
 				case 19:
 					this.setPreferredSize(new Dimension(800, 800));
-					//this.height = 1050;
-					//this.width = 1050;
 			}
 			
 			
@@ -276,25 +346,65 @@ public class GUI {
 		}
 	}
 	
+	public class MainFrame extends JFrame
+	{
+		//private FlowLayout layout;
+		//GridBagConstraints gbc = new GridBagConstraints();
+		private int size = 0;
+		public MainFrame() {
+			super("Hello World");
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			switch(GUI.this.sizeofboard) {
+			case 9:
+				setPreferredSize(new Dimension(800, 440));
+				this.size = 400;
+				break;
+			case 13:
+				setPreferredSize(new Dimension(1120, 600));
+				this.size = 560;
+				break;
+			case 19:
+				setPreferredSize(new Dimension(1600, 840));
+				this.size = 800;
+				break;
+			}
+			/*setLayout(new GridBagLayout());
+			GridBagConstraints gc = new GridBagConstraints();
+			gc.anchor = GridBagConstraints.NORTHWEST;
+			gc.weightx = 1;
+			//gc.weighty = 1;
+			//pierwszy panel
+			//gc.anchor = GridBagConstraints.WEST;
+			//gc.weightx = 1.5;
+			//gc.weighty = 1.5;
+			
+			
+			MyPanel panel = new MyPanel(GUI.this.sizeofboard);
+			panel.setPreferredSize(new Dimension(this.size, this.size));
+			add(panel, gc);
+			*/
+			//drugi panel
+			//gc.weightx = 1;
+			//gc.weighty = 1.5;
+			
+			//gc.gridx = 1;
+			//gc.gridy = 0;
+			
+			//add(new SecondPanel(GUI.this.sizeofboard), gc);
+		}
+	}
+
 	
 	//glowne okno
 	public void initMainFrame() {
 		GUI.this.getFrame().dispose();
 		JFrame main = new MainFrame();
-		switch(GUI.this.sizeofboard) {
-			case 9:
-				main.setPreferredSize(new Dimension(650, 440));
-				break;
-			case 13:
-				main.setPreferredSize(new Dimension(850, 560));
-				break;
-			case 19:
-				main.setPreferredSize(new Dimension(1250, 800));
-				break;
-		}
+		
 		//main.setSize(new Dimension(650,600));
-		main.setLayout(new FlowLayout(0,0,0));
+		main.setLayout(new GridLayout(0,2));
+		//main.setLayout(new GridBagLayout());
 		main.add(new MyPanel(this.sizeofboard));
+		main.add(new SecondPanel(this.sizeofboard));
 		//main.setComponentOrientation(
         //       ComponentOrientation.LEFT_TO_RIGHT);
 		//main.add(new JPanel());
