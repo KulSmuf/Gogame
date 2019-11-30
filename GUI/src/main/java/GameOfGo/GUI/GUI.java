@@ -191,7 +191,7 @@ public class GUI {
 			
 			JLabel jency = new JLabel("Ilosc jencow");
 			//jency.setPreferredSize(new Dimension(width, (int)0.25*height));
-			
+			c.weighty = 0.5;
 			c.gridx = 0;
 			c.gridy = 0;
 			c.fill = GridBagConstraints.HORIZONTAL;
