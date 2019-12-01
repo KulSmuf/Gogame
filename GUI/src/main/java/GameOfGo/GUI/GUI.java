@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.AbstractButton;
@@ -27,20 +28,59 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JWindow;
+
+import client.Client;
 
 public class GUI {
-
 	
+	
+	
+	
+	//to trzeba zmienic na true przy rozpoczeciu gry
+	public boolean active = false;
+	//instancja klienta
+	public Client gracz;
+	
+	void getClient() {
+		try {
+			gracz = new Client();
+		}
+		catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 	//firstframe
 	private JFrame pierwsza;
+	//secondpanel
+	private SecondPanel pi;
 	//9,13,19
 	private int sizeofboard;
-	//false to bot, true to gracz
+	//false to czarny, true to bialy
 	private boolean whichplayer;
+	//czy bot
+	private boolean bot = false;
+	
+	public void setBot(boolean i) {
+		this.bot = i;
+	}
+	
+	public boolean getBot() {
+		return this.bot;
+	}
 	
 	public void setFrame(JFrame frame) {
 		this.pierwsza = frame;
+	}
+	
+	public SecondPanel getSPanel() {
+		return this.pi;
+	}
+	
+	public void setSPanel(SecondPanel panel) {
+		this.pi = panel;
 	}
 	
 	public JFrame getFrame() {
@@ -141,7 +181,7 @@ public class GUI {
 	public void setW19(boolean w19) {
 		this.w19 = w19;
 	}
-
+	
 	//initfirstframe
 	private static int fwidth;
 	private static int fheight;
@@ -158,9 +198,18 @@ public class GUI {
 		GUI.this.setFrame(one);
 	}
 	
+	//metoda GUI po zrobieniu ruchu przez przeciwnika
+		//przekazuje string z lokacja kamienia przeciwnika
+		public void zrobRuch(String namiary) {
+			
+			getSPanel().turaGracza();
+		}
+	
 	public class SecondPanel extends JPanel implements ActionListener{
 		JButton pass;
 		JButton surr;
+		JLabel kogotura2;
+		JLabel kogotura;
 		int width;
 		int height;
 		public SecondPanel(int size) {
@@ -183,10 +232,10 @@ public class GUI {
 			}*/
 			setLayout(new GridBagLayout());
 			GridBagConstraints c = new GridBagConstraints();
-			JLabel kogotura = new JLabel("Tura przeciwnika");
+			kogotura = new JLabel("Tura przeciwnika");
 			//kogotura.setPreferredSize(new Dimension(width, (int)0.25*height));
 			
-			JLabel kogotura2 = new JLabel("Twoja tura");
+			kogotura2 = new JLabel("Twoja tura");
 			//kogotura2.setPreferredSize(new Dimension(width, (int)0.25*height));
 			
 			JLabel jency = new JLabel("Ilosc jencow");
@@ -234,12 +283,25 @@ public class GUI {
 			Object source = e.getSource();
 			if(source == pass) {
 				//wyslij klientem
+				//if active czyli czy twoja tura
+				//gracz.sendCom("pass")
 			}
 			else if(source == surr) {
 				//wyslij klientem
+				//gracz.sendCom("surr")
 			}
 			
 			
+		}
+		//zmienia jlabel
+		public void turaPrzeciwnika() {
+			kogotura.setVisible(true);
+			kogotura2.setVisible(false);
+		}
+		
+		public void turaGracza() {
+			kogotura.setVisible(false);
+			kogotura2.setVisible(true);
 		}
 		
 		
@@ -258,17 +320,49 @@ public class GUI {
 		private ArrayList<JButton> przyciski = new ArrayList<JButton>();
 		//kamienie
 		private ArrayList<JButton> kamienie = new ArrayList<JButton>();
+		//kamienie przeciwnika
+		private ArrayList<JButton> kamieniep = new ArrayList<JButton>();
 		
 		private Color background = new Color(249, 235, 106);
 		
+		//bedzie czytal string od serwera, sam go przetwarzal i dodawal w tym miejscu kamien przeciwnika
+		public void addkamien(String pozycja) {
+			//parse string
+			String[] tokens = pozycja.split("x");
+			int x = Integer.parseInt(tokens[0]);
+			int y = Integer.parseInt(tokens[1]);
+			//znalezc odpowiedni przycisk
+			for(JButton b:przyciski) {
+				if(x == b.getBounds().x/40 && y == b.getBounds().y/40) {
+					b.setEnabled(false);
+					b.setVisible(false);
+					kamieniep.add(b);
+					repaint();
+				}
+			}
+		}
+		
 		public void actionPerformed(ActionEvent f) {
-			//sprawdzaj ktory gracz gra, dodawaj do dwoch roznych list
+			//sprawdza czy nie tura przeciwnika
+			if(active) {
 			Object source = f.getSource();
+			//wysyla serwerowi ruch gracza w postaci XY zaczynajac od 1x1
+			String str = Integer.toString((int)((AbstractButton)source).getBounds().getX()/40);
+			String str2 = Integer.toString((int)((AbstractButton)source).getBounds().getY()/40);
+			//GUI.this.gracz.SendCom(str+"x"+str2);
+			//if SendCom!=null przeprowadz ruch, jesli null to nic nie rob
+			
+			
+			//sprawdzaj ktory gracz gra, dodawaj do dwoch roznych list
 			((AbstractButton) source).setEnabled(false);
 			((AbstractButton) source).setVisible(false);
 			this.kamienie.add((JButton) source);
 			repaint();
-			
+			//wywoluj metode tura przeciwnika
+			//czekaj na ruch przeciwnika, jesli null to znaczy ze wyszedl
+			//tura Przeciwnika wiec nic nie mozesz zrobic
+			active=false;
+			}
 		}
 		
 		
@@ -297,9 +391,6 @@ public class GUI {
 					this.add(ada);
 				}
 			}
-			
-			
-			
 		}
 
 		@Override
@@ -327,14 +418,22 @@ public class GUI {
 			for(JButton s:kamienie) {
 				int x = s.getLocation().x - 15;
 				int y = s.getLocation().y - 15;
-				
-				//gracz
 				if(isWhichplayer()==true) {
 				    iconw.paintIcon(this, g, x, y);
 				}
-				//
 				else {
 					iconb.paintIcon(this, g, x, y);
+				}
+			}
+				
+			for(JButton p:kamieniep) {
+				int xp = p.getLocation().x - 15;
+				int yp = p.getLocation().y - 15;
+				if(isWhichplayer()==true) {
+				    iconb.paintIcon(this, g, xp, yp);
+				}
+				else {
+					iconw.paintIcon(this, g, xp, yp);
 				}
 			}
 			
@@ -344,6 +443,7 @@ public class GUI {
 
 			
 		}
+		
 	}
 	
 	public class MainFrame extends JFrame
@@ -403,8 +503,11 @@ public class GUI {
 		//main.setSize(new Dimension(650,600));
 		main.setLayout(new GridLayout(0,2));
 		//main.setLayout(new GridBagLayout());
-		main.add(new MyPanel(this.sizeofboard));
-		main.add(new SecondPanel(this.sizeofboard));
+		MyPanel panel1 = new MyPanel(this.sizeofboard);
+		main.add(panel1);
+		SecondPanel panel2 = new SecondPanel(this.sizeofboard);
+		main.add(panel2);
+		setSPanel(panel2);
 		//main.setComponentOrientation(
         //       ComponentOrientation.LEFT_TO_RIGHT);
 		//main.add(new JPanel());
@@ -413,7 +516,27 @@ public class GUI {
 		main.setLocationRelativeTo(null);
 		main.setVisible(true);
 	}
-	
+	public class WaitingPanel extends JPanel{
+		JButton zrezygnuj;
+		JLabel oczekiwanie;
+		public WaitingPanel() {
+			setLayout(new GridLayout(0,1));
+			
+			oczekiwanie = new JLabel("Oczekiwanie na serwer");
+			add(oczekiwanie);
+			
+			zrezygnuj = new JButton("Zrezygnuj");
+			add(zrezygnuj);
+			zrezygnuj.addActionListener(new ActionListener() {
+		            @Override
+		            public void actionPerformed(ActionEvent e) {
+		                //GUI.this.gracz.SendCom("q");
+		                //wyjscie z aplikacji
+		            }
+		        });
+		}
+		
+	}
 	public class FirstPanel extends JPanel implements ActionListener{
 		
 		private JFrame okno;
@@ -538,8 +661,28 @@ public class GUI {
 				if(bot.isEnabled() == false) {
 					GUI.this.setWhichplayer(true);
 				}
+				//wyslij start size w/b
+				//jakis concat stringow
+				String rozmiar = Integer.toString(GUI.this.Getsizeoftheboard());
+				String zkimgram;
+				if(getBot() == true) {
+					zkimgram = "b";
+				}
+				else {
+					zkimgram = "p";
+				}
+				String odp = GUI.this.gracz.SendCom(rozmiar+zkimgram);
+				JWindow okno = new JWindow();
+				okno.add(new WaitingPanel());
+				okno.setSize(new Dimension(200,200));
+				okno.setVisible(true);
+				okno.setLocationRelativeTo(null);
+				//zaleznie od tego co przyjdzie, czy mozesz przyjsc cos innego niz tak?
+				if(odp != null) {
+					okno.setVisible(false);
+					initMainFrame();
+				}
 				
-				initMainFrame();
 			}
 	}
 	
@@ -564,4 +707,4 @@ public class GUI {
 		});
     }
 
-}
+ }
