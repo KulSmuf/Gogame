@@ -40,7 +40,7 @@ public class GUI {
 	
 	
 	//to trzeba zmienic na true przy rozpoczeciu gry
-	public boolean active = false;
+	public boolean active;
 	//instancja klienta
 	public Client gracz;
 	
@@ -54,6 +54,8 @@ public class GUI {
 	}
 	//firstframe
 	private JFrame pierwsza;
+	//mypanel
+	private MyPanel panel;
 	//secondpanel
 	private SecondPanel pi;
 	//9,13,19
@@ -62,6 +64,14 @@ public class GUI {
 	private boolean whichplayer;
 	//czy bot
 	private boolean bot = false;
+	
+	public void setMPanel(MyPanel p) {
+		this.panel = p;
+	}
+	
+	public MyPanel getMPanel() {
+		return this.panel;
+	}
 	
 	public void setBot(boolean i) {
 		this.bot = i;
@@ -198,10 +208,10 @@ public class GUI {
 		GUI.this.setFrame(one);
 	}
 	
-	//metoda GUI po zrobieniu ruchu przez przeciwnika
+		//metoda GUI po zrobieniu ruchu przez przeciwnika
 		//przekazuje string z lokacja kamienia przeciwnika
 		public void zrobRuch(String namiary) {
-			
+			this.panel.addkamien(namiary);
 			getSPanel().turaGracza();
 		}
 	
@@ -386,6 +396,7 @@ public class GUI {
 				for(int k=1;k<=dim;k++) {
 					JButton ada = new JButton();
 					ada.setBounds(r*40, k*40, 5, 5);
+					ada.setBackground(background);
 					ada.addActionListener(this);
 					przyciski.add(ada);
 					this.add(ada);
@@ -679,6 +690,14 @@ public class GUI {
 				okno.setLocationRelativeTo(null);
 				//zaleznie od tego co przyjdzie, czy mozesz przyjsc cos innego niz tak?
 				if(odp != null) {
+					if(odp == "b") {
+						setWhichplayer(true);
+						active = false;
+					}
+					else {
+						setWhichplayer(false);
+						active = true;
+					}
 					okno.setVisible(false);
 					initMainFrame();
 				}
