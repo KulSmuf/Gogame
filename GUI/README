@@ -6,11 +6,11 @@ Komendy klienta do serwera:
 Komendy serwera do klienta:
 	startowa: "(B|W)" - zwracana po startowej, przydziela kolor kamieni
 	niepoprawny ruch: "0" - zwracana po wykonaniu złego ruchu
-	poprawny ruch: "1" lub koordynaty zbitych kamieni, np: "1,1 12,9"
+	poprawny ruch: "1" lub ilość zbitych kamieni i ich koordynaty, np: "2 1,1 12,9"
 	ruch przeciwnika: - zwraca ruch przeciwnika
 						pierwsze dwa numery to miejsce postawienia kamienia przeciwniki
-						num1 to liczba zbitych kamieni przez przeciwnika
+						trzeci to liczba zbitych kamieni przez przeciwnika
 						kolejne numery to koordynaty zbitych kamieni
 						np:
-							"1,12" - brak zbitych kamieni
-							"2,6 1,1 1,2 2,3" - przeciwnik zbił 3 kamienie
+							"1,12 0" - brak zbitych kamieni
+							"2,6 3 1,1 1,2 2,3" - przeciwnik zbił 3 kamienie
