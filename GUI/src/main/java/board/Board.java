@@ -29,10 +29,41 @@ public class Board {
 			int c = stone.getColumn();
 			board[r][c] = 'E';
 			stoneBoard[r][c] = null;
+			
+			// up
+			if( r != 0 ) {
+				int nr = r-1;
+				int nc = c;
+				if( board[nr][nc] != 'E' ) stoneBoard[nr][nc].gainBreath();
+			}
+			
+			// down
+			if ( r != size-1 ) {
+				int nr = r+1;
+				int nc = c;
+				if( board[nr][nc] != 'E' ) stoneBoard[nr][nc].gainBreath();
+			}
+			
+			// left
+			if( c != 0 ) {
+				int nr = r;
+				int nc = c-1;
+				if( board[nr][nc] != 'E' ) stoneBoard[nr][nc].gainBreath();
+			}
+			
+			// right
+			if ( c != size-1 ) {
+				int nr = r;
+				int nc = c+1;
+				if( board[nr][nc] != 'E' ) stoneBoard[nr][nc].gainBreath();
+			}
 		}
 	}
 	
 	public String makeMove(int r, int c) {
+		
+		System.out.println(currentPlayer + " moves");
+		
 		int breaths = 0;
 		int capturedStones = 0;
 		String ret = "";
@@ -47,6 +78,7 @@ public class Board {
 			else {
 				stoneBoard[nr][nc].reduceBreath();
 				if( board[nr][nc] == currentPlayer ) {
+					System.out.println("hey mate");
 					stoneChain = stoneBoard[nr][nc].getStoneChain();
 				}
 				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
@@ -123,13 +155,15 @@ public class Board {
 		}
 		
 		// conclusion
+		System.out.println("Stonechain status: " + (stoneChain == null));
 		if( stoneChain == null ) stoneBoard[r][c] = new Stone( r,c, breaths );
 		else stoneBoard[r][c] = new Stone( r,c,breaths, stoneChain );
 		board[r][c] = currentPlayer;
 		
+		System.out.println("stone: " + breaths);
+		System.out.println("stoneChain: " + stoneBoard[r][c].getStoneChain().getBreaths() + " length: " + stoneBoard[r][c].getStoneChain().getChainLength());
 		
-		
-		if( capturedStones == 0 ) ret = "1";
+		if( capturedStones == 0 ) ret = "0";
 		else ret = Integer.toString(capturedStones) + " " + ret;
 		
 		messageLog = Integer.toString(r) + "," + Integer.toString(c) + " " + ret;
@@ -137,11 +171,13 @@ public class Board {
 		if( currentPlayer == 'W' ) currentPlayer = 'B';
 		else currentPlayer = 'W';
 		
+		if( ret.compareTo("0") == 0 ) ret = "1";
 		return ret;
 	}
 	
 	public boolean checkCorrectness(int r, int c) {
 		if( board[r][c] == 'E' ) {
+			
 			// up
 			if ( r != 0 ) {
 				int nr = r-1;
@@ -151,7 +187,7 @@ public class Board {
 				else if( board[nr][nc] == currentPlayer ) {
 					if( stoneBoard[nr][nc].getBreaths() > 1 ) return true;
 				}
-				else if( stoneBoard[nr][nc].getBreaths() == 1 ) return true;
+				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 1 ) return true;
 			}
 			
 			// down
@@ -163,7 +199,7 @@ public class Board {
 				else if( board[nr][nc] == currentPlayer ) {
 					if( stoneBoard[nr][nc].getBreaths() > 1 ) return true;
 				}
-				else if( stoneBoard[nr][nc].getBreaths() == 1 ) return true;
+				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 1 ) return true;
 			}
 			
 			// left
@@ -175,7 +211,7 @@ public class Board {
 				else if( board[nr][nc] == currentPlayer ) {
 					if( stoneBoard[nr][nc].getBreaths() > 1 ) return true;
 				}
-				else if( stoneBoard[nr][nc].getBreaths() == 1 ) return true;
+				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 1 ) return true;
 			}
 			
 			// right
@@ -187,7 +223,7 @@ public class Board {
 				else if( board[nr][nc] == currentPlayer ) {
 					if( stoneBoard[nr][nc].getBreaths() > 1 ) return true;
 				}
-				else if( stoneBoard[nr][nc].getBreaths() == 1 ) return true;
+				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 1 ) return true;
 			}
 		}
 		return false;

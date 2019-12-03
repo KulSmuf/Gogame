@@ -1,10 +1,10 @@
 package board;
 
 public class Stone {
-	int r;
-	int c;
-	int breaths;
-	CompositeStone stoneChain;
+	private int r;
+	private int c;
+	private int breaths;
+	private CompositeStone stoneChain;
 	
 	public Stone(int r, int c, int breaths, CompositeStone stoneChain) {
 		this.r = r;
@@ -23,6 +23,10 @@ public class Stone {
 	
 	public void reduceBreath() {
 		breaths--;
+	}
+	
+	public void gainBreath() {
+		breaths++;
 	}
 
 	public CompositeStone getStoneChain() {
