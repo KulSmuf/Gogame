@@ -61,9 +61,7 @@ public class Board {
 	}
 	
 	public String makeMove(int r, int c) {
-		
-		System.out.println(currentPlayer + " moves");
-		
+				
 		int breaths = 0;
 		int capturedStones = 0;
 		String ret = "";
@@ -78,7 +76,6 @@ public class Board {
 			else {
 				stoneBoard[nr][nc].reduceBreath();
 				if( board[nr][nc] == currentPlayer ) {
-					System.out.println("hey mate");
 					stoneChain = stoneBoard[nr][nc].getStoneChain();
 				}
 				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
@@ -155,13 +152,9 @@ public class Board {
 		}
 		
 		// conclusion
-		System.out.println("Stonechain status: " + (stoneChain == null));
 		if( stoneChain == null ) stoneBoard[r][c] = new Stone( r,c, breaths );
 		else stoneBoard[r][c] = new Stone( r,c,breaths, stoneChain );
 		board[r][c] = currentPlayer;
-		
-		System.out.println("stone: " + breaths);
-		System.out.println("stoneChain: " + stoneBoard[r][c].getStoneChain().getBreaths() + " length: " + stoneBoard[r][c].getStoneChain().getChainLength());
 		
 		if( capturedStones == 0 ) ret = "0";
 		else ret = Integer.toString(capturedStones) + " " + ret;
@@ -235,5 +228,9 @@ public class Board {
 	
 	public String getMessageLog() {
 		return messageLog;
+	}
+	
+	public void setExitMessage() {
+		this.messageLog = "exit";
 	}
 }

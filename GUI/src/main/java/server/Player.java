@@ -71,8 +71,11 @@ class Player implements Runnable {
 	
 	public void interpretClientCommand( String clientCommand ) {
 		if( clientCommand.compareTo("exit") == 0 ) {
-			//System.exit(0);
-			//TODO: inform opponent about exit and exit safely
+			board.setExitMessage();
+			synchronized( opponent.flag ) {
+				opponent.flag.notify();
+			}
+			System.exit(0);
 		}
 		else {
 			int[] cords = parseCords( clientCommand.split(" ") );
@@ -109,7 +112,7 @@ class Player implements Runnable {
 			}
 			else {
 				sendCommand( board.getMessageLog() );
-				if( board.getMessageLog().compareTo("exit") == 0 ) return;
+				if( board.getMessageLog().compareTo("exit") == 0 ) System.exit(0);
 			}
 		}
 	}
