@@ -192,7 +192,9 @@ class Player implements Runnable {
 				}
 				
 				message.setMessage("fromOpponent");
-				message.notify();
+				synchronized( message ) {
+					message.notify();
+				}
 				
 			}
 		}

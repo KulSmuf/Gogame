@@ -18,7 +18,7 @@ public class Board {
 		for( int i=0;i<size;i++ ) {
 			for( int j=0;j<size;j++ ) {
 				board[i][j] = 'E';
-				stoneBoard = null;
+				stoneBoard[i][j] = null;
 			}
 		}
 	}
@@ -47,8 +47,7 @@ public class Board {
 			else {
 				stoneBoard[nr][nc].reduceBreath();
 				if( board[nr][nc] == currentPlayer ) {
-					if( stoneChain == null ) stoneChain = stoneBoard[nr][nc].getStoneChain();
-					else stoneChain.merge( stoneBoard[nr][nc].getStoneChain() );
+					stoneChain = stoneBoard[nr][nc].getStoneChain();
 				}
 				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
 					if( ret.length() > 0 ) ret+=" ";
@@ -124,16 +123,16 @@ public class Board {
 		}
 		
 		// conclusion
-		if( stoneChain == null ) stoneBoard[r][c] = new Stone( r,c,breaths );
+		if( stoneChain == null ) stoneBoard[r][c] = new Stone( r,c, breaths );
 		else stoneBoard[r][c] = new Stone( r,c,breaths, stoneChain );
 		board[r][c] = currentPlayer;
 		
 		
 		
-		if( capturedStones == 0 ) ret = "0";
+		if( capturedStones == 0 ) ret = "1";
 		else ret = Integer.toString(capturedStones) + " " + ret;
 		
-		messageLog = Integer.toString(r) + "," + Integer.toString(c) + ret;
+		messageLog = Integer.toString(r) + "," + Integer.toString(c) + " " + ret;
 		
 		if( currentPlayer == 'W' ) currentPlayer = 'B';
 		else currentPlayer = 'W';
