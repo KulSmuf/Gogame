@@ -36,7 +36,9 @@ class Player implements Runnable {
 	public void setOpponent( Player opponent, Board board ) {
 		this.opponent = opponent;
 		this.board = board;
-		this.opponent.notify();
+		synchronized(out) {
+			out.notify();
+		}
 	}
 	
 	public void sendCommand( String command ) {
@@ -68,7 +70,7 @@ class Player implements Runnable {
 	}
 	
 	private void startGame() {
-		
+				
 		Thread opponentListener = new OpponentListener();
 		Thread clientListener = new ClientListener();
 		opponentListener.start();
@@ -107,21 +109,24 @@ class Player implements Runnable {
 			synchronized(myServer.waitingPlayers) {
 				if( myServer.waitingPlayers.getWaitingPlayer(boardSize) == null ) myServer.waitingPlayers.addWaitingPlayer(this, boardSize);
 				else {
-					board = new Board(9);
-					color = 'W';
-					myServer.waitingPlayers.getWaitingPlayer(boardSize).setOpponent(this, board);
+					opponent = myServer.waitingPlayers.getWaitingPlayer(boardSize);
 					myServer.waitingPlayers.removeWaitingPlayer(boardSize);
 				}
 			}
 
 			if( opponent == null ) {
-				synchronized( opponent ) {
+				synchronized( out ) {
 					try {
-						opponent.wait();
+						out.wait();
 					} catch (InterruptedException e) {
 						return;
 					}
 				}
+			}
+			else {
+				board = new Board(9);
+				color = 'W';
+				opponent.setOpponent(this, board);
 			}
 			sendCommand( Character.toString(color) );
 			startGame();

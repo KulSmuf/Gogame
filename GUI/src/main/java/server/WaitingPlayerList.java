@@ -17,8 +17,10 @@ class WaitingPlayerList {
 	}
 	
 	public void removeWaitingPlayer( int boardSize ) {
-		for( WaitingPlayer player: playerList ) {
-			if( player.getBoardSize() == boardSize ) playerList.remove(player);
+		for( int i=0;i<playerList.size();i++ ) {
+			if( playerList.get(i).getBoardSize() == boardSize ) {
+				playerList.remove(playerList.get(i));
+			}
 		}
 	}
 	
