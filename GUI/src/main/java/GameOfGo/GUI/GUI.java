@@ -45,18 +45,19 @@ public class GUI {
 	
 	class coms_to_gui extends TimerTask
 	{
-		String odp;
+		String odp = "";
 		public void run() {
 			try {
 				if(gracz.hasServerSendCommand()) {
 					odp = gracz.getServerCommand();
+					zrobRuch(odp);
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			//if na wiadomosc przy poddaniu i wygraniu i przegraniu
-			zrobRuch(odp);
+			//zrobRuch(odp);
 			
 		}
 		
@@ -372,7 +373,7 @@ public class GUI {
 		private int width = 0;
 		private ArrayList<Line2D> linie = new ArrayList<Line2D>();
 		//tablica przyciskow
-		private ArrayList<JButton> przyciski = new ArrayList<JButton>();
+		ArrayList<JButton> przyciski = new ArrayList<JButton>();
 		//kamienie
 		private ArrayList<JButton> kamienie = new ArrayList<JButton>();
 		//kamienie przeciwnika
@@ -433,14 +434,27 @@ public class GUI {
 			//if SendCommand=1 przeprowadz ruch, jesli nie to nic nie rob
 			try {
 				while(GUI.this.gracz.hasServerSendCommand() == false) {
-					//
+					
 				}
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			String response = GUI.this.gracz.getServerCommand();
-			if(response != "0") {
+			JOptionPane.showMessageDialog(getFrame(), response);
+			if(response.equals("1")) {
+				((AbstractButton) source).setEnabled(false);
+				((AbstractButton) source).setVisible(false);
+				this.kamienie.add((JButton) source);
+				repaint();
+				//wywoluj metode tura przeciwnika
+				//czekaj na ruch przeciwnika, jesli null to znaczy ze wyszedl
+				//tura Przeciwnika wiec nic nie mozesz zrobic
+				active=false;
+				GUI.this.getSPanel().turaPrzeciwnika();
+				timer.scheduleAtFixedRate(task, date, 2000);
+			}
+			else if(response != "0" && response != "1" && response.isEmpty()==false) {
 				String[] tokens = response.split(" ");
 				for(int u=1;u<=Integer.parseInt(tokens[0]);u++) {
 					String[] cordinates = tokens[u].split(",");
@@ -452,7 +466,7 @@ public class GUI {
 							b.setEnabled(true);
 							b.setVisible(true);
 							kamieniep.remove(b);
-							repaint();
+							//repaint();
 						}
 					 }
 				}
@@ -614,6 +628,12 @@ public class GUI {
 		SecondPanel panel2 = new SecondPanel(this.sizeofboard);
 		main.add(panel2);
 		setSPanel(panel2);
+		if(isWhichplayer()==false) {
+			panel2.turaGracza();
+		}
+		else {
+			panel2.turaPrzeciwnika();
+		}
 		//main.setComponentOrientation(
         //       ComponentOrientation.LEFT_TO_RIGHT);
 		//main.add(new JPanel());
@@ -626,7 +646,7 @@ public class GUI {
 		JButton zrezygnuj;
 		JLabel oczekiwanie;
 		public WaitingPanel() {
-			setLayout(new GridLayout(0,1));
+			setLayout(new GridLayout(2,1));
 			
 			oczekiwanie = new JLabel("Oczekiwanie na serwer");
 			add(oczekiwanie);
@@ -643,6 +663,31 @@ public class GUI {
 		            }
 		        });
 		}
+		
+	}
+	
+	public class WaitingFrame extends JFrame{
+		
+		WaitingFrame(){
+			//super();
+			setPreferredSize(new Dimension(400,400));
+			setResizable(false);
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			
+			JButton zrezygnuj = new JButton("Zrezygnuj");
+			JLabel oczekiwanie = new JLabel("Oczekiwanie na serwer");
+			JPanel panel = new JPanel();
+			
+			panel.add(zrezygnuj);
+			panel.add(oczekiwanie);
+			
+			this.getContentPane().add(panel);
+			setVisible(true);
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		}
+		
+		
+		
 		
 	}
 	public class FirstPanel extends JPanel implements ActionListener{
@@ -789,13 +834,15 @@ public class GUI {
 				else {
 					zkimgram = "p";
 				}
-				GUI.this.gracz.sendCommand(rozmiar+zkimgram);
-				JFrame okno = new JFrame();
+				getClient();
+				GUI.this.gracz.sendCommand(rozmiar+" "+zkimgram);
+				WaitingFrame okno = new WaitingFrame();
 				GUI.this.setWFrame(okno);
-				okno.add(new WaitingPanel());
-				okno.setSize(new Dimension(200,200));
-				okno.setVisible(true);
-				okno.setLocationRelativeTo(null);
+				//okno.add(new WaitingPanel());
+				//okno.setSize(new Dimension(300,300));
+				//okno.pack();
+				//okno.setLocationRelativeTo(null);
+				//okno.setVisible(true);
 				//zaleznie od tego co przyjdzie, czy mozesz przyjsc cos innego niz tak?
 				try {
 					while(GUI.this.gracz.hasServerSendCommand() == false) {
@@ -807,11 +854,11 @@ public class GUI {
 				}
 					if(GUI.this.gracz.getServerCommand() == "B") {
 						setWhichplayer(true);
-						active = false;
+						setActive(false);
 					}
 					else {
 						setWhichplayer(false);
-						active = true;
+						setActive(true);
 					}
 					okno.setVisible(false);
 					//zacznij timer
