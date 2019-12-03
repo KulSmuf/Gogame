@@ -12,28 +12,24 @@ public class Client {
 	private Socket socket;
 	private Scanner in;
 	private PrintWriter out;
-	private GUI gui;
 	
-	public Client(GUI gui) throws Exception {
+	public Client() throws Exception {
 		socket = new Socket( "localhost", 50000 );
 		this.in = new Scanner( socket.getInputStream() );
 		this.out = new PrintWriter( socket.getOutputStream() );
-		this.gui = gui;
 	}
 	
-	public String sendCom( String command ) {
-		out.println(command); out.flush();
-		
-		while( !in.hasNextLine() );
+	public boolean hasServerSendCommand() {
+		return in.hasNextLine();
+	}
+	
+	public String getServerCommand() {
 		String respond = in.nextLine();
-		
 		return respond;
 	}
-
-	class CustomThread extends Thread {
-		@Override
-		public void run() {
-			
-		}
+	
+	public void sendCommand( String command ) {
+		out.println(command);
+		out.flush();
 	}
 }
