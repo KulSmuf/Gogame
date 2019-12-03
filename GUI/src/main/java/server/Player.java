@@ -7,11 +7,12 @@ import java.util.Scanner;
 
 class Player implements Runnable {
 	
-	Socket socket;
+	private Socket socket;
 	private Scanner in;
 	private PrintWriter out;
+	private Server myServer;
 	
-	public Player(Socket socket) {
+	public Player(Socket socket, Server myServer) {
 		this.socket = socket;
 		try {
 			in = new Scanner( socket.getInputStream() );
@@ -19,10 +20,16 @@ class Player implements Runnable {
 		} catch (IOException e) {
 			System.out.println("Error: " + e);
 		}
+		this.myServer = myServer;
 	}
 
 	public void run() {
-		
+		while(true) {
+			if( in.hasNextLine() ) {
+				in.nextLine();
+				out.println("respond");
+				out.flush();
+			}
+		}
 	}
-
 }
