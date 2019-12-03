@@ -5,10 +5,11 @@ Komendy klienta do serwera:
 	
 Komendy serwera do klienta:
 	startowa: "(B|W)" - zwracana po startowej, przydziela kolor kamieni
-	boolowska: "(1|0)" - zwracana po wykonaniu ruchu
-	ruch przeciwnika: "{num},{num} {num1}" + num1*" {num},{num}" - zwraca ruch przeciwnika
+	niepoprawny ruch: "0" - zwracana po wykonaniu złego ruchu
+	poprawny ruch: "1" lub ilość zbitych kamieni i ich koordynaty, np: "2 1,1 12,9"
+	ruch przeciwnika: - zwraca ruch przeciwnika
 						pierwsze dwa numery to miejsce postawienia kamienia przeciwniki
-						num1 to liczba zbitych kamieni przez przeciwnika
+						trzeci to liczba zbitych kamieni przez przeciwnika
 						kolejne numery to koordynaty zbitych kamieni
 						np:
 							"1,12 0" - brak zbitych kamieni

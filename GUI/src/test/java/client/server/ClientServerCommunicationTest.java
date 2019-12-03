@@ -17,25 +17,16 @@ public class ClientServerCommunicationTest {
 		MockServer mockServer = new MockServer();
 		mockServer.start();
 		
-		Client client = new Client();
+		Client player1 = new Client();
+		player1.sendCommand("9 p");
 		
-		assertTrue( !client.hasServerSendCommand() );
+		Client player2 = new Client();
+		player2.sendCommand("9 p");
 		
-		client.sendCommand("ask");
+		while( !player1.hasServerSendCommand() );
+		System.out.println("command from server " + player1.getServerCommand());
 		
-		while( !client.hasServerSendCommand() );
-		
-		assertEquals( "respond",client.getServerCommand() );
-	}
-	
-	class MockServer extends Thread{
-		public void run() {
-			try {
-				Server mockServer = new Server();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		while( !player2.hasServerSendCommand() );
+		System.out.println("command from server " + player2.getServerCommand());
 	}
 }
