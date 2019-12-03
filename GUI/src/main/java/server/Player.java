@@ -9,8 +9,7 @@ import java.util.Scanner;
 import board.Board;
 
 class Player implements Runnable {
-	
-	private Socket socket;
+
 	private Scanner in;
 	private InputStream inStream;
 	private PrintWriter out;
@@ -26,7 +25,6 @@ class Player implements Runnable {
 	private Message message = new Message(" ");
 	
 	public Player(Socket socket, Server myServer) {
-		this.socket = socket;
 		try {
 			in = new Scanner( socket.getInputStream() );
 			this.inStream = socket.getInputStream();
@@ -69,13 +67,13 @@ class Player implements Runnable {
 		return ret;
 	}
 	
-	public void interpretClientCommand( String clientCommand ) {
+	public boolean interpretClientCommand( String clientCommand ) {
 		if( clientCommand.compareTo("exit") == 0 ) {
 			board.setExitMessage();
 			synchronized( opponent.flag ) {
 				opponent.flag.notify();
 			}
-			System.exit(0);
+			return true;
 		}
 		else {
 			int[] cords = parseCords( clientCommand.split(" ") );
@@ -88,6 +86,7 @@ class Player implements Runnable {
 			}
 			else sendCommand("0");
 		}
+		return false;
 	}
 	
 	private void startGame() {
@@ -107,12 +106,12 @@ class Player implements Runnable {
 			}
 			
 			if( message.getMessage().compareTo("fromClient") == 0 ) {
-				interpretClientCommand( getClientCommand() );
+				if( interpretClientCommand( getClientCommand() ) ) return;
 				message.setMessage(" ");
 			}
 			else {
-				sendCommand( board.getMessageLog() );
-				if( board.getMessageLog().compareTo("exit") == 0 ) System.exit(0);
+				sendCommand( board.getMessageLog() ); 
+				if( board.getMessageLog().compareTo("exit") == 0 ) return;
 			}
 		}
 	}

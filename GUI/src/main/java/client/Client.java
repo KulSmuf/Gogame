@@ -6,10 +6,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-import javax.swing.SwingUtilities;
-
-import GameOfGo.GUI.GUI;
-
 public class Client {
 	private Socket socket;
 	private Scanner in;

@@ -6,7 +6,7 @@ import org.junit.Test;
 
 public class StoneTest {
 	@Test
-	public void StoneMergeTest() {
+	public void testStoneMerge() {
 		Stone stone1 = new Stone( 0,0,2 );
 		Stone stone2 = new Stone( 0,2,3 );
 		Stone stone3 = new Stone( 1,0,2, stone1.getStoneChain() );

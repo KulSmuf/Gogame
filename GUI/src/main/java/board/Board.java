@@ -97,7 +97,7 @@ public class Board {
 				stoneBoard[nr][nc].reduceBreath();
 				if( board[nr][nc] == currentPlayer ) {
 					if( stoneChain == null ) stoneChain = stoneBoard[nr][nc].getStoneChain();
-					else stoneChain.merge( stoneBoard[nr][nc].getStoneChain() );
+					else if( !stoneChain.equals( stoneBoard[nr][nc].getStoneChain() ) ) stoneChain.merge( stoneBoard[nr][nc].getStoneChain() );
 				}
 				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
 					if( ret.length() > 0 ) ret+=" ";
@@ -118,7 +118,7 @@ public class Board {
 				stoneBoard[nr][nc].reduceBreath();
 				if( board[nr][nc] == currentPlayer ) {
 					if( stoneChain == null ) stoneChain = stoneBoard[nr][nc].getStoneChain();
-					else stoneChain.merge( stoneBoard[nr][nc].getStoneChain() );
+					else if( !stoneChain.equals( stoneBoard[nr][nc].getStoneChain() ) ) stoneChain.merge( stoneBoard[nr][nc].getStoneChain() );
 				}
 				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
 					if( ret.length() > 0 ) ret+=" ";
@@ -139,7 +139,7 @@ public class Board {
 				stoneBoard[nr][nc].reduceBreath();
 				if( board[nr][nc] == currentPlayer ) {
 					if( stoneChain == null ) stoneChain = stoneBoard[nr][nc].getStoneChain();
-					else stoneChain.merge( stoneBoard[nr][nc].getStoneChain() );
+					else if( !stoneChain.equals( stoneBoard[nr][nc].getStoneChain() ) ) stoneChain.merge( stoneBoard[nr][nc].getStoneChain() );
 				}
 				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
 					if( ret.length() > 0 ) ret+=" ";
@@ -220,10 +220,6 @@ public class Board {
 			}
 		}
 		return false;
-	}
-	
-	public char whichPlayerTurn() {
-		return currentPlayer;
 	}
 	
 	public String getMessageLog() {
