@@ -4,27 +4,36 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
+import javax.swing.SwingUtilities;
+
+import GameOfGo.GUI.GUI;
+
 public class Client {
 	private Socket socket;
 	private Scanner in;
 	private PrintWriter out;
+	private GUI gui;
 	
-	/* mozliwe komendy:
-	 * start(9,13,19)(p/b), po wybraniu rozmiaru i czy gra z botem czy nie
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 */
-	public Client() throws Exception {
+	public Client(GUI gui) throws Exception {
 		socket = new Socket( "localhost", 50000 );
 		this.in = new Scanner( socket.getInputStream() );
 		this.out = new PrintWriter( socket.getOutputStream() );
+		this.gui = gui;
 	}
-	public String SendCom( String command ) {
+	
+	public String sendCom( String command ) {
 		out.println(command); out.flush();
-		String ret = in.nextLine(); 
-		return ret;
+		
+		while( !in.hasNextLine() );
+		String respond = in.nextLine();
+		
+		return respond;
+	}
+
+	class CustomThread extends Thread {
+		@Override
+		public void run() {
+			
+		}
 	}
 }
