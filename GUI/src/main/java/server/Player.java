@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
+import board.Board;
+
 class Player implements Runnable {
 	
 	private Socket socket;
@@ -19,7 +21,9 @@ class Player implements Runnable {
 	private Player opponent;
 	private char color = 'B';
 	
-	private String getMessage;
+	public Object flag = new Object();
+	
+	private Message message = new Message(" ");
 	
 	public Player(Socket socket, Server myServer) {
 		this.socket = socket;
@@ -60,12 +64,26 @@ class Player implements Runnable {
 		return respond;
 	}
 	
+	public int[] parseCords( String[] stringCords ) {
+		int[] ret = { Integer.parseInt(stringCords[0]), Integer.parseInt(stringCords[1]) };
+		return ret;
+	}
+	
 	public void interpretClientCommand( String clientCommand ) {
 		if( clientCommand.compareTo("exit") == 0 ) {
+			//System.exit(0);
 			//TODO: inform opponent about exit and exit safely
 		}
 		else {
-			//TODO: check player move correctness
+			int[] cords = parseCords( clientCommand.split(" ") );
+			
+			if( board.checkCorrectness( cords[0], cords[1] ) ) {
+				sendCommand( board.makeMove( cords[0], cords[1] ) );
+				synchronized( opponent.flag ) {
+					opponent.flag.notify();
+				}
+			}
+			else sendCommand("0");
 		}
 	}
 	
@@ -77,20 +95,21 @@ class Player implements Runnable {
 		clientListener.start();
 		
 		while(true) {
-			synchronized( getMessage ) {
+			synchronized( message ) {
 				try {
-					getMessage.wait();
+					message.wait();
 				} catch (InterruptedException e) {
 					System.out.println("Player interrupted waiting for message");
 				}
 			}
 			
-			if( getMessage.compareTo("fromClient") == 0 ) {
+			if( message.getMessage().compareTo("fromClient") == 0 ) {
 				interpretClientCommand( getClientCommand() );
-				getMessage = null;
+				message.setMessage(" ");
 			}
 			else {
-				// TODO: interpret opponent command
+				sendCommand( board.getMessageLog() );
+				if( board.getMessageLog().compareTo("exit") == 0 ) return;
 			}
 		}
 	}
@@ -140,9 +159,11 @@ class Player implements Runnable {
 			
 			while( !thisThread.isInterrupted() ) {
 				
-				if( getMessage.compareTo("fromClient") != 0 && hasClientSendCommand() ) {
-					getMessage = "fromClient";
-					getMessage.notify();
+				if( message.getMessage().compareTo("fromClient") != 0 && hasClientSendCommand() ) {
+					synchronized(message) {
+						message.setMessage("fromClient");
+						message.notify();
+					}
 				}
 				
 				try {
@@ -162,18 +183,34 @@ class Player implements Runnable {
 			
 			while( !thisThread.isInterrupted() ) {
 				
-				synchronized( board ) {
+				synchronized( flag ) {
 					try {
-						board.wait();
+						flag.wait();
 					} catch (InterruptedException e) {
 						return;
 					}
 				}
 				
-				getMessage = "fromOpponent";
-				getMessage.notify();
+				message.setMessage("fromOpponent");
+				message.notify();
 				
 			}
 		}
+	}
+	
+	class Message{
+		String message;
+		
+		Message(String message){
+			this.message = message;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
+		public void setMessage(String message) {
+			this.message = message;
+		}	
 	}
 }
