@@ -32,11 +32,35 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.*;
+
 import client.Client;
 
 public class GUI {
+	Timer timer = new Timer(); 
+    TimerTask task = new coms_to_gui(); 
+    Date date = new Date();
 	
-	
+	class coms_to_gui extends TimerTask
+	{
+		String odp;
+		public void run() {
+			try {
+				if(gracz.hasServerSendCommand()) {
+					odp = gracz.getServerCommand();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//if na wiadomosc przy poddaniu i wygraniu i przegraniu
+			zrobRuch(odp);
+			
+		}
+		
+	}
 	
 	
 	//to trzeba zmienic na true przy rozpoczeciu gry
@@ -54,6 +78,8 @@ public class GUI {
 	}
 	//firstframe
 	private JFrame pierwsza;
+	//waitingframe
+	private JFrame waiting;
 	//mypanel
 	private MyPanel panel;
 	//secondpanel
@@ -63,7 +89,7 @@ public class GUI {
 	//false to czarny, true to bialy
 	private boolean whichplayer;
 	//czy bot
-	private boolean bot = false;
+	private boolean bot;
 	
 	public void setMPanel(MyPanel p) {
 		this.panel = p;
@@ -71,6 +97,14 @@ public class GUI {
 	
 	public MyPanel getMPanel() {
 		return this.panel;
+	}
+	
+	public void setWFrame(JFrame w) {
+		this.waiting = w;
+	}
+	
+	public JFrame getWframe() {
+		return this.waiting;
 	}
 	
 	public void setBot(boolean i) {
@@ -303,11 +337,13 @@ public class GUI {
 			if(source == pass) {
 				//wyslij klientem
 				//if active czyli czy twoja tura
-				//gracz.sendCom("pass")
+				GUI.this.gracz.sendCommand("pass");
+				active=false;
+				GUI.this.getSPanel().turaPrzeciwnika();
 			}
 			else if(source == surr) {
 				//wyslij klientem
-				//gracz.sendCom("surr")
+				GUI.this.gracz.sendCommand("surr");
 			}
 			
 			
@@ -347,7 +383,7 @@ public class GUI {
 		//bedzie czytal string od serwera, sam go przetwarzal i dodawal w tym miejscu kamien przeciwnika
 		public void addkamien(String pozycja) {
 			//parse string
-			String[] tokens = pozycja.split("x");
+			String[] tokens = pozycja.split(" ");
 			if(tokens == null) {
 				throw new IllegalArgumentException("zły format");
 			}
@@ -356,13 +392,31 @@ public class GUI {
 			if(x>GUI.this.sizeofboard || y>GUI.this.sizeofboard || x<1 || y<1) {
 				throw new IllegalArgumentException("złe dane");
 			}
+			
 			//znalezc odpowiedni przycisk
-			for(JButton b:przyciski) {
+			 for(JButton b:przyciski) {
 				if(x == b.getBounds().x/40 && y == b.getBounds().y/40) {
 					b.setEnabled(false);
 					b.setVisible(false);
 					kamieniep.add(b);
 					repaint();
+				}
+			 
+			}
+			if(tokens[2] != "0") {
+				int ile = Integer.parseInt(tokens[2]);
+				for(int u=0;u<ile;u++) {
+					int s = Integer.parseInt(tokens[ile+2*u]);
+					int r = Integer.parseInt(tokens[ile+2*u+1]);
+					for(JButton b:przyciski) {
+						if(s == b.getBounds().x/40 && r == b.getBounds().y/40) {
+							//usunac moje kamyki i zwolnic miejsce, wlaczyc przyciski
+							b.setEnabled(true);
+							b.setVisible(true);
+							kamienie.remove(b);
+							repaint();
+						}
+					 }
 				}
 			}
 		}
@@ -374,11 +428,34 @@ public class GUI {
 			//wysyla serwerowi ruch gracza w postaci XY zaczynajac od 1x1
 			String str = Integer.toString((int)((AbstractButton)source).getBounds().getX()/40);
 			String str2 = Integer.toString((int)((AbstractButton)source).getBounds().getY()/40);
-			//GUI.this.gracz.SendCom(str+"x"+str2);
-			//if SendCom!=null przeprowadz ruch, jesli null to nic nie rob
-			
-			
-
+			timer.cancel();
+			GUI.this.gracz.sendCommand(str+" "+str2);
+			//if SendCommand=1 przeprowadz ruch, jesli nie to nic nie rob
+			try {
+				while(GUI.this.gracz.hasServerSendCommand() == false) {
+					//
+				}
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			String response = GUI.this.gracz.getServerCommand();
+			if(response != "0") {
+				String[] tokens = response.split(" ");
+				for(int u=1;u<=Integer.parseInt(tokens[0]);u++) {
+					String[] cordinates = tokens[u].split(",");
+					int s = Integer.parseInt(cordinates[0]);
+					int r = Integer.parseInt(cordinates[1]);
+					for(JButton b:przyciski) {
+						if(s == b.getBounds().x/40 && r == b.getBounds().y/40) {
+							//usunac kamienie przeciwnika i zwolnic miejsce, wlaczyc przyciski
+							b.setEnabled(true);
+							b.setVisible(true);
+							kamieniep.remove(b);
+							repaint();
+						}
+					 }
+				}
 			((AbstractButton) source).setEnabled(false);
 			((AbstractButton) source).setVisible(false);
 			this.kamienie.add((JButton) source);
@@ -387,6 +464,9 @@ public class GUI {
 			//czekaj na ruch przeciwnika, jesli null to znaczy ze wyszedl
 			//tura Przeciwnika wiec nic nie mozesz zrobic
 			active=false;
+			GUI.this.getSPanel().turaPrzeciwnika();
+			timer.scheduleAtFixedRate(task, date, 2000);
+			}
 			}
 		}
 		
@@ -556,8 +636,10 @@ public class GUI {
 			zrezygnuj.addActionListener(new ActionListener() {
 		            @Override
 		            public void actionPerformed(ActionEvent e) {
-		                //GUI.this.gracz.SendCom("q");
+		                GUI.this.gracz.sendCommand("quit");
 		                //wyjscie z aplikacji
+		                GUI.this.getWframe().dispose();
+		                System.exit(0);
 		            }
 		        });
 		}
@@ -671,22 +753,32 @@ public class GUI {
 				size19.setBackground(myWhite);
 			}
 			else if(source == zagraj) {
+				//czy zainicjowales size i player
+				int s = 0;
+				int p = 0;
 				
 				if(size9.isEnabled() == false) {
 					 GUI.this.setSizeoftheboard(9);
+					 s++;
 				}
 				if(size13.isEnabled() == false) {
 					GUI.this.setSizeoftheboard(13);
+					s++;
 				}
 				if(size19.isEnabled() == false) {
 					GUI.this.setSizeoftheboard(19);
+					s++;
 				}
 				if(gracz.isEnabled() == false) {
 					GUI.this.setBot(false);
+					p++;
 				}
 				if(bot.isEnabled() == false) {
 					GUI.this.setBot(true);
+					p++;
 				}
+				
+				if(s!=0 && p!=0) {
 				//wyslij start size w/b
 				//jakis concat stringow
 				String rozmiar = Integer.toString(GUI.this.Getsizeoftheboard());
@@ -697,15 +789,23 @@ public class GUI {
 				else {
 					zkimgram = "p";
 				}
-				//String odp = GUI.this.gracz.SendCom(rozmiar+zkimgram);
+				GUI.this.gracz.sendCommand(rozmiar+zkimgram);
 				JFrame okno = new JFrame();
+				GUI.this.setWFrame(okno);
 				okno.add(new WaitingPanel());
 				okno.setSize(new Dimension(200,200));
 				okno.setVisible(true);
 				okno.setLocationRelativeTo(null);
 				//zaleznie od tego co przyjdzie, czy mozesz przyjsc cos innego niz tak?
-				/*if(odp != null) {
-					if(odp == "b") {
+				try {
+					while(GUI.this.gracz.hasServerSendCommand() == false) {
+						//
+					}
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+					if(GUI.this.gracz.getServerCommand() == "B") {
 						setWhichplayer(true);
 						active = false;
 					}
@@ -714,9 +814,12 @@ public class GUI {
 						active = true;
 					}
 					okno.setVisible(false);
+					//zacznij timer
+					timer.scheduleAtFixedRate(task,date,2000);
 					initMainFrame();
 				}
-				*/
+				
+				
 			}
 	}
 	
