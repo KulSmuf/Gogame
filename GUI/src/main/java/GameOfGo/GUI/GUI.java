@@ -40,7 +40,7 @@ public class GUI {
 	
 	
 	//to trzeba zmienic na true przy rozpoczeciu gry
-	public boolean active;
+	private boolean active;
 	//instancja klienta
 	public Client gracz;
 	
@@ -79,6 +79,14 @@ public class GUI {
 	
 	public boolean getBot() {
 		return this.bot;
+	}
+	
+	public void setActive(boolean i) {
+		this.active = i;
+	}
+	
+	public boolean isActive() {
+		return this.active;
 	}
 	
 	public void setFrame(JFrame frame) {
@@ -213,6 +221,7 @@ public class GUI {
 		public void zrobRuch(String namiary) {
 			this.panel.addkamien(namiary);
 			getSPanel().turaGracza();
+			setActive(true);
 		}
 	
 	public class SecondPanel extends JPanel implements ActionListener{
@@ -339,8 +348,14 @@ public class GUI {
 		public void addkamien(String pozycja) {
 			//parse string
 			String[] tokens = pozycja.split("x");
+			if(tokens == null) {
+				throw new IllegalArgumentException("zły format");
+			}
 			int x = Integer.parseInt(tokens[0]);
 			int y = Integer.parseInt(tokens[1]);
+			if(x>GUI.this.sizeofboard || y>GUI.this.sizeofboard || x<1 || y<1) {
+				throw new IllegalArgumentException("złe dane");
+			}
 			//znalezc odpowiedni przycisk
 			for(JButton b:przyciski) {
 				if(x == b.getBounds().x/40 && y == b.getBounds().y/40) {
@@ -354,7 +369,7 @@ public class GUI {
 		
 		public void actionPerformed(ActionEvent f) {
 			//sprawdza czy nie tura przeciwnika
-			if(active) {
+			if(isActive()) {
 			Object source = f.getSource();
 			//wysyla serwerowi ruch gracza w postaci XY zaczynajac od 1x1
 			String str = Integer.toString((int)((AbstractButton)source).getBounds().getX()/40);
@@ -363,7 +378,7 @@ public class GUI {
 			//if SendCom!=null przeprowadz ruch, jesli null to nic nie rob
 			
 			
-			//sprawdzaj ktory gracz gra, dodawaj do dwoch roznych list
+
 			((AbstractButton) source).setEnabled(false);
 			((AbstractButton) source).setVisible(false);
 			this.kamienie.add((JButton) source);
@@ -667,10 +682,10 @@ public class GUI {
 					GUI.this.setSizeoftheboard(19);
 				}
 				if(gracz.isEnabled() == false) {
-					GUI.this.setWhichplayer(false);
+					GUI.this.setBot(false);
 				}
 				if(bot.isEnabled() == false) {
-					GUI.this.setWhichplayer(true);
+					GUI.this.setBot(true);
 				}
 				//wyslij start size w/b
 				//jakis concat stringow
@@ -682,14 +697,14 @@ public class GUI {
 				else {
 					zkimgram = "p";
 				}
-				String odp = GUI.this.gracz.SendCom(rozmiar+zkimgram);
-				JWindow okno = new JWindow();
+				//String odp = GUI.this.gracz.SendCom(rozmiar+zkimgram);
+				JFrame okno = new JFrame();
 				okno.add(new WaitingPanel());
 				okno.setSize(new Dimension(200,200));
 				okno.setVisible(true);
 				okno.setLocationRelativeTo(null);
 				//zaleznie od tego co przyjdzie, czy mozesz przyjsc cos innego niz tak?
-				if(odp != null) {
+				/*if(odp != null) {
 					if(odp == "b") {
 						setWhichplayer(true);
 						active = false;
@@ -701,7 +716,7 @@ public class GUI {
 					okno.setVisible(false);
 					initMainFrame();
 				}
-				
+				*/
 			}
 	}
 	
