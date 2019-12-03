@@ -1,6 +1,6 @@
 package client.server;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 
@@ -17,10 +17,14 @@ public class ClientServerCommunicationTest {
 		MockServer mockServer = new MockServer();
 		mockServer.start();
 		
-		Client client = new Client();		
+		Client client = new Client();
+		
+		assertTrue( !client.hasServerSendCommand() );
+		
 		client.sendCommand("ask");
 		
 		while( !client.hasServerSendCommand() );
+		
 		assertEquals( "respond",client.getServerCommand() );
 	}
 	
