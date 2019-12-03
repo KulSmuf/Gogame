@@ -1,13 +1,10 @@
 package client.server;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
 import client.Client;
-import server.Server;
 
 public class ClientServerCommunicationTest {
 
@@ -51,6 +48,6 @@ public class ClientServerCommunicationTest {
 		move = "exit";
 		player2.sendCommand(move);
 		while( !player1.hasServerSendCommand() );
-		assertEquals( "exit" , player2.getServerCommand());
+		assertEquals( "exit" ,player1.getServerCommand() );
 	}
 }
