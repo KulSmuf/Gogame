@@ -1,5 +1,5 @@
 package GameOfGo.GUI;
-
+/*
 import GameOfGo.GUI.GUI.MyPanel;
 import org.junit.Test;
 
@@ -28,3 +28,4 @@ public class Exceptions {
 	
 	
 }
+*/

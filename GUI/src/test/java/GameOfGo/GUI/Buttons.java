@@ -1,5 +1,5 @@
 package GameOfGo.GUI;
-
+/*
 import static org.junit.Assert.*;
 
 import javax.swing.JButton;
@@ -49,3 +49,4 @@ public class Buttons {
 	}
 
 }
+*/
