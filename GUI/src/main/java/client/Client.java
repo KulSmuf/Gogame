@@ -25,6 +25,7 @@ public class Client {
 	
 	public String getServerCommand() {
 		String respond = in.nextLine();
+		System.out.println(respond);
 		return respond;
 	}
 	

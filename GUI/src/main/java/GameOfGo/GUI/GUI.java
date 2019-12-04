@@ -400,19 +400,21 @@ public class GUI {
 		//bedzie czytal string od serwera, sam go przetwarzal i dodawal w tym miejscu kamien przeciwnika
 		public void addkamien(String pozycja) {
 			//parse string
-			String[] tokens = pozycja.split(" ");
+			//nie uwzgledniamy tych co przeciwnik zbil
+			String[] tokenss = pozycja.split(" ");
+			String[] tokens = tokenss[0].split(",");
 			if(tokens == null) {
 				throw new IllegalArgumentException("zły format");
 			}
 			int x = Integer.parseInt(tokens[0]);
 			int y = Integer.parseInt(tokens[1]);
-			if(x>GUI.this.sizeofboard || y>GUI.this.sizeofboard || x<1 || y<1) {
+			if(x>GUI.this.sizeofboard || y>GUI.this.sizeofboard || x<0 || y<0) {
 				throw new IllegalArgumentException("złe dane");
 			}
 			
 			//znalezc odpowiedni przycisk
 			 for(JButton b:przyciski) {
-				if(x == b.getBounds().x/40 && y == b.getBounds().y/40) {
+				if(x == b.getBounds().x/40-1 && y == b.getBounds().y/40-1) {
 					b.setEnabled(false);
 					b.setVisible(false);
 					kamieniep.add(b);
@@ -420,13 +422,14 @@ public class GUI {
 				}
 			 
 			}
-			if(tokens[2] != "0") {
-				int ile = Integer.parseInt(tokens[2]);
+			if(tokenss[1] != "0") {
+				int ile = Integer.parseInt(tokenss[1]);
 				for(int u=0;u<ile;u++) {
-					int s = Integer.parseInt(tokens[ile+2*u]);
-					int r = Integer.parseInt(tokens[ile+2*u+1]);
+					String[] namiar = tokenss[2+u].split(",");
+					int s = Integer.parseInt(namiar[0]);
+					int r = Integer.parseInt(namiar[1]);
 					for(JButton b:przyciski) {
-						if(s == b.getBounds().x/40 && r == b.getBounds().y/40) {
+						if(s == b.getBounds().x/40-1 && r == b.getBounds().y/40-1) {
 							//usunac moje kamyki i zwolnic miejsce, wlaczyc przyciski
 							b.setEnabled(true);
 							b.setVisible(true);
@@ -443,11 +446,11 @@ public class GUI {
 			if(isActive()) {
 			Object source = f.getSource();
 			//wysyla serwerowi ruch gracza w postaci XY zaczynajac od 1x1
-			String str = Integer.toString((int)((AbstractButton)source).getBounds().getX()/40);
-			String str2 = Integer.toString((int)((AbstractButton)source).getBounds().getY()/40);
-			if(!(getTimer()==null)) {
+			String str = Integer.toString((int)((AbstractButton)source).getBounds().getX()/40-1);
+			String str2 = Integer.toString((int)((AbstractButton)source).getBounds().getY()/40-1);
+		
 				getTimer().cancel();
-			}
+			
 			GUI.this.gracz.sendCommand(str+" "+str2);
 			//if SendCommand=1 przeprowadz ruch, jesli nie to nic nie rob
 			try {
@@ -471,6 +474,7 @@ public class GUI {
 				active=false;
 				GUI.this.getSPanel().turaPrzeciwnika();
 				Timer timer = new Timer();
+				TimerTask task = new coms_to_gui(); 
 				timer.scheduleAtFixedRate(task, date, 2000);
 				setTimer(timer);
 			}
@@ -481,7 +485,7 @@ public class GUI {
 					int s = Integer.parseInt(cordinates[0]);
 					int r = Integer.parseInt(cordinates[1]);
 					for(JButton b:przyciski) {
-						if(s == b.getBounds().x/40 && r == b.getBounds().y/40) {
+						if(s == b.getBounds().x/40-1 && r == b.getBounds().y/40-1) {
 							//usunac kamienie przeciwnika i zwolnic miejsce, wlaczyc przyciski
 							b.setEnabled(true);
 							b.setVisible(true);
@@ -500,6 +504,7 @@ public class GUI {
 			active=false;
 			GUI.this.getSPanel().turaPrzeciwnika();
 			Timer timer = new Timer();
+			TimerTask task = new coms_to_gui(); 
 			timer.scheduleAtFixedRate(task, date, 2000);
 			setTimer(timer);
 			}
@@ -879,7 +884,8 @@ public class GUI {
 						setWhichplayer(true);
 						setActive(false);
 						//odpal Timera
-						Timer timer = new Timer(); 
+						Timer timer = new Timer();
+						TimerTask task = new coms_to_gui(); 
 						timer.scheduleAtFixedRate(task,date,2000);
 						setTimer(timer);
 					}
