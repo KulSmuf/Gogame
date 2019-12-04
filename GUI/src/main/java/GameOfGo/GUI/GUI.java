@@ -39,13 +39,13 @@ import java.util.*;
 import client.Client;
 
 public class GUI {
-	Timer timer = new Timer(); 
+	Timer timer;
     TimerTask task = new coms_to_gui(); 
     Date date = new Date();
 	
 	class coms_to_gui extends TimerTask
 	{
-		String odp = "";
+		String odp;
 		public void run() {
 			try {
 				if(gracz.hasServerSendCommand()) {
@@ -53,7 +53,7 @@ public class GUI {
 					zrobRuch(odp);
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				// TODO Auto-generated catch block-
 				e.printStackTrace();
 			}
 			//if na wiadomosc przy poddaniu i wygraniu i przegraniu
@@ -63,6 +63,21 @@ public class GUI {
 		
 	}
 	
+	
+	public Timer getTimer() {
+		if(this.timer != null) {
+		 return this.timer;
+		}
+		else {
+			Timer tim = new Timer();
+			setTimer(tim);
+			return tim;
+		}
+	}
+	
+	public void setTimer(Timer tim) {
+		this.timer = tim;
+	}
 	
 	//to trzeba zmienic na true przy rozpoczeciu gry
 	private boolean active;
@@ -257,6 +272,7 @@ public class GUI {
 			this.panel.addkamien(namiary);
 			getSPanel().turaGracza();
 			setActive(true);
+			
 		}
 	
 	public class SecondPanel extends JPanel implements ActionListener{
@@ -429,7 +445,9 @@ public class GUI {
 			//wysyla serwerowi ruch gracza w postaci XY zaczynajac od 1x1
 			String str = Integer.toString((int)((AbstractButton)source).getBounds().getX()/40);
 			String str2 = Integer.toString((int)((AbstractButton)source).getBounds().getY()/40);
-			timer.cancel();
+			if(!(getTimer()==null)) {
+				getTimer().cancel();
+			}
 			GUI.this.gracz.sendCommand(str+" "+str2);
 			//if SendCommand=1 przeprowadz ruch, jesli nie to nic nie rob
 			try {
@@ -452,9 +470,11 @@ public class GUI {
 				//tura Przeciwnika wiec nic nie mozesz zrobic
 				active=false;
 				GUI.this.getSPanel().turaPrzeciwnika();
+				Timer timer = new Timer();
 				timer.scheduleAtFixedRate(task, date, 2000);
+				setTimer(timer);
 			}
-			else if(response != "0" && response != "1" && response.isEmpty()==false) {
+			else if(!response.equals("0") && !response.equals("1") && response.isEmpty()==false) {
 				String[] tokens = response.split(" ");
 				for(int u=1;u<=Integer.parseInt(tokens[0]);u++) {
 					String[] cordinates = tokens[u].split(",");
@@ -479,7 +499,9 @@ public class GUI {
 			//tura Przeciwnika wiec nic nie mozesz zrobic
 			active=false;
 			GUI.this.getSPanel().turaPrzeciwnika();
+			Timer timer = new Timer();
 			timer.scheduleAtFixedRate(task, date, 2000);
+			setTimer(timer);
 			}
 			}
 		}
@@ -627,6 +649,7 @@ public class GUI {
 		main.add(panel1);
 		SecondPanel panel2 = new SecondPanel(this.sizeofboard);
 		main.add(panel2);
+		setMPanel(panel1);
 		setSPanel(panel2);
 		if(isWhichplayer()==false) {
 			panel2.turaGracza();
@@ -852,17 +875,19 @@ public class GUI {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-					if(GUI.this.gracz.getServerCommand() == "B") {
+					if(GUI.this.gracz.getServerCommand().equals("B")) {
 						setWhichplayer(true);
 						setActive(false);
+						//odpal Timera
+						Timer timer = new Timer(); 
+						timer.scheduleAtFixedRate(task,date,2000);
+						setTimer(timer);
 					}
 					else {
 						setWhichplayer(false);
 						setActive(true);
 					}
 					okno.setVisible(false);
-					//zacznij timer
-					timer.scheduleAtFixedRate(task,date,2000);
 					initMainFrame();
 				}
 				
