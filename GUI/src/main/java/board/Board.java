@@ -11,6 +11,7 @@ public class Board {
 	private char[][] board;
 	private Stone[][] stoneBoard;
 	private boolean pass = false;
+	private int[] ko = null;
 
 	public Board( int size ){
 		board = new char[size][size];
@@ -100,6 +101,7 @@ public class Board {
 					if( ret[0].length() > 0 ) ret[0]+=" ";
 					ret[0]+=stoneBoard[nr][nc].getStoneChain().toString();
 					capturedStones+=stoneBoard[nr][nc].getStoneChain().getChainLength();
+					if( capturedStones == 1 ) ko = new int[] {nr,nc};
 					removeStoneChain( stoneBoard[nr][nc].getStoneChain() );
 					breaths.add(newCords);
 				}
@@ -110,6 +112,7 @@ public class Board {
 	}
 	
 	public String makeMove(int r, int c) {
+		ko = null;
 		int[] cords = {r,c};
 		int[] newCords;
 		pass = false;
@@ -166,6 +169,7 @@ public class Board {
 	
 	public boolean checkCorrectness(int r, int c) {
 		if( board[r][c] == 'E' ) {
+			if( ko != null && ko[0] == r && ko[1] == c ) return false;
 			
 			// up
 			if( checkField(r-1, c) ) return true;

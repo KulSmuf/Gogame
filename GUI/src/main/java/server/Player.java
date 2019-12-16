@@ -38,8 +38,8 @@ class Player implements Runnable {
 	public void setOpponent( Player opponent, Board board ) {
 		this.opponent = opponent;
 		this.board = board;
-		synchronized(out) {
-			out.notify();
+		synchronized(message) {
+			message.notify();
 		}
 	}
 	
@@ -101,8 +101,8 @@ class Player implements Runnable {
 	
 	private void startGame() {
 				
-		Thread opponentListener = new OpponentListener();
 		Thread clientListener = new ClientListener();
+		Thread opponentListener = new OpponentListener();
 		opponentListener.start();
 		clientListener.start();
 		
@@ -134,8 +134,11 @@ class Player implements Runnable {
 		String[] StartConfiguration = getClientCommand().split(" ");
 		int boardSize = Integer.parseInt( StartConfiguration[0] );
 		
+		Thread clientListener = new ClientListener();
+		
 		// configuration if pvp game
 		if( StartConfiguration[1].compareTo("p") == 0 ) {
+			
 			
 			synchronized(myServer.waitingPlayers) {
 				if( myServer.waitingPlayers.getWaitingPlayer(boardSize) == null ) myServer.waitingPlayers.addWaitingPlayer(this, boardSize);
@@ -146,12 +149,20 @@ class Player implements Runnable {
 			}
 
 			if( opponent == null ) {
-				synchronized( out ) {
+				clientListener.start();
+				synchronized( message ) {
 					try {
-						out.wait();
+						message.wait();
 					} catch (InterruptedException e) {
 						return;
 					}
+				}
+				clientListener.interrupt();
+				if(message.getMessage().compareTo("exit") == 0) {
+					synchronized(myServer.waitingPlayers) {
+						myServer.waitingPlayers.removeWaitingPlayer(boardSize);
+					}
+					return;
 				}
 			}
 			else {
@@ -161,6 +172,9 @@ class Player implements Runnable {
 			}
 			sendCommand( Character.toString(color) );
 			startGame();
+		}
+		else {
+			// TODO: bot
 		}
 	}
 	

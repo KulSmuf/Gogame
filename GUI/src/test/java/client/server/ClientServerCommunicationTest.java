@@ -24,13 +24,10 @@ public class ClientServerCommunicationTest {
 		while( !player1.hasServerSendCommand() ); 
 		String respond = player1.getServerCommand(); 
 		assertEquals( "B" , respond);
-		
-		
-		
+				
 		while( !player2.hasServerSendCommand() );
 		respond = player2.getServerCommand();
 		assertEquals( "W" , respond);
-		
 		
 		//   Ruch gracza pierwszego
 		String move = "0 0";
@@ -43,7 +40,7 @@ public class ClientServerCommunicationTest {
 		//   Ruch gracza drugiego
 		move = "0 1";
 		player2.sendCommand(move);
-		
+				
 		while( !player1.hasServerSendCommand() );
 		assertEquals( "0,1 0" , player1.getServerCommand());
 		while( !player2.hasServerSendCommand() );
