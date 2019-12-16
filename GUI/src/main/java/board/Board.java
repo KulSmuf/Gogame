@@ -1,16 +1,18 @@
 package board;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board {
 	
 	private String messageLog;
 	
-	private int size;
 	private char currentPlayer;
 	private char[][] board;
 	private Stone[][] stoneBoard;
+	private boolean pass = false;
 
 	public Board( int size ){
-		this.size = size;
 		board = new char[size][size];
 		stoneBoard = new Stone[size][size];
 		currentPlayer = 'B';
@@ -23,14 +25,35 @@ public class Board {
 		}
 	}
 	
+	public boolean pass() {
+		return !( pass = !pass );
+	}
+	
+	public void removeField( int[] cords, int nr, int nc ) {
+		try {
+			if( board[nr][nc] != 'E' ) stoneBoard[nr][nc].getStoneChain().gainBreath(cords);
+		}
+		catch( ArrayIndexOutOfBoundsException e ) {}
+	}
+	
 	public void removeStoneChain( CompositeStone stoneChain ) {
 		for( Stone stone:stoneChain.getStoneChain() ) {
 			int r = stone.getRow();
 			int c = stone.getColumn();
+			int[] cords = {r,c};
 			board[r][c] = 'E';
 			stoneBoard[r][c] = null;
 			
 			// up
+			removeField( cords,r-1,c );
+			// down
+			removeField( cords,r+1,c );
+			// left
+			removeField( cords,r,c-1 );
+			// right
+			removeField( cords,r,c+1 );
+			
+			/*
 			if( r != 0 ) {
 				int nr = r-1;
 				int nc = c;
@@ -57,167 +80,101 @@ public class Board {
 				int nc = c+1;
 				if( board[nr][nc] != 'E' ) stoneBoard[nr][nc].gainBreath();
 			}
+			*/
 		}
 	}
 	
-	public String makeMove(int r, int c) {
-				
-		int breaths = 0;
+	public int updateField( List<int[]> breaths, int[] cords, int[] newCords, CompositeStone[] stoneChain, String[] ret) {
 		int capturedStones = 0;
-		String ret = "";
+		int nr = newCords[0];
+		int nc = newCords[1];
 		
-		CompositeStone stoneChain = null;
+		try {
+			if( board[nr][nc] == 'E' ) breaths.add(newCords);
+			else {
+				stoneBoard[nr][nc].getStoneChain().reduceBreath(cords);
+				if( board[nr][nc] == currentPlayer ) {
+					stoneChain[0] = stoneBoard[nr][nc].getStoneChain();
+				}
+				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
+					if( ret[0].length() > 0 ) ret[0]+=" ";
+					ret[0]+=stoneBoard[nr][nc].getStoneChain().toString();
+					capturedStones+=stoneBoard[nr][nc].getStoneChain().getChainLength();
+					removeStoneChain( stoneBoard[nr][nc].getStoneChain() );
+					breaths.add(newCords);
+				}
+			}
+		}
+		catch( ArrayIndexOutOfBoundsException e ) {}
+		return capturedStones;
+	}
+	
+	public String makeMove(int r, int c) {
+		int[] cords = {r,c};
+		int[] newCords;
+		pass = false;
+		
+		List<int[]> breaths = new ArrayList<int[]>();
+		int capturedStones = 0;
+		String[] ret = new String[] {""};
+		
+		CompositeStone[] stoneChain = new CompositeStone[1];
+		stoneChain[0] = null;
 		
 		// up
-		if( r != 0 ) {
-			int nr = r-1;
-			int nc = c;
-			if( board[nr][nc] == 'E' ) breaths++;
-			else {
-				stoneBoard[nr][nc].reduceBreath();
-				if( board[nr][nc] == currentPlayer ) {
-					stoneChain = stoneBoard[nr][nc].getStoneChain();
-				}
-				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
-					if( ret.length() > 0 ) ret+=" ";
-					ret+=stoneBoard[nr][nc].getStoneChain().toString();
-					capturedStones+=stoneBoard[nr][nc].getStoneChain().getChainLength();
-					removeStoneChain( stoneBoard[nr][nc].getStoneChain() );
-					breaths++;
-				}
-			}
-		}
-		
+		newCords = new int[]{ r-1,c };
+		capturedStones += updateField(breaths, cords, newCords, stoneChain, ret);
 		// down
-		if ( r != size-1 ) {
-			int nr = r+1;
-			int nc = c;
-			if( board[nr][nc] == 'E' ) breaths++;
-			else {
-				stoneBoard[nr][nc].reduceBreath();
-				if( board[nr][nc] == currentPlayer ) {
-					if( stoneChain == null ) stoneChain = stoneBoard[nr][nc].getStoneChain();
-					else if( !stoneChain.equals( stoneBoard[nr][nc].getStoneChain() ) ) stoneChain.merge( stoneBoard[nr][nc].getStoneChain() );
-				}
-				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
-					if( ret.length() > 0 ) ret+=" ";
-					ret+=stoneBoard[nr][nc].getStoneChain().toString();
-					capturedStones+=stoneBoard[nr][nc].getStoneChain().getChainLength();
-					removeStoneChain( stoneBoard[nr][nc].getStoneChain() );
-					breaths++;
-				}
-			}
-		}
-		
+		newCords = new int[]{ r+1,c };
+		capturedStones += updateField(breaths, cords, newCords, stoneChain, ret);
 		// left
-		if( c != 0 ) {
-			int nr = r;
-			int nc = c-1;
-			if( board[nr][nc] == 'E' ) breaths++;
-			else {
-				stoneBoard[nr][nc].reduceBreath();
-				if( board[nr][nc] == currentPlayer ) {
-					if( stoneChain == null ) stoneChain = stoneBoard[nr][nc].getStoneChain();
-					else if( !stoneChain.equals( stoneBoard[nr][nc].getStoneChain() ) ) stoneChain.merge( stoneBoard[nr][nc].getStoneChain() );
-				}
-				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
-					if( ret.length() > 0 ) ret+=" ";
-					ret+=stoneBoard[nr][nc].getStoneChain().toString();
-					capturedStones+=stoneBoard[nr][nc].getStoneChain().getChainLength();
-					removeStoneChain( stoneBoard[nr][nc].getStoneChain() );
-					breaths++;
-				}
-			}
-		}
-		
+		newCords = new int[]{ r,c-1 };
+		capturedStones += updateField(breaths, cords, newCords, stoneChain, ret);
 		// right
-		if ( c != size-1 ) {
-			int nr = r;
-			int nc = c+1;
-			if( board[nr][nc] == 'E' ) breaths++;
-			else {
-				stoneBoard[nr][nc].reduceBreath();
-				if( board[nr][nc] == currentPlayer ) {
-					if( stoneChain == null ) stoneChain = stoneBoard[nr][nc].getStoneChain();
-					else if( !stoneChain.equals( stoneBoard[nr][nc].getStoneChain() ) ) stoneChain.merge( stoneBoard[nr][nc].getStoneChain() );
-				}
-				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
-					if( ret.length() > 0 ) ret+=" ";
-					ret+=stoneBoard[nr][nc].getStoneChain().toString();
-					capturedStones+=stoneBoard[nr][nc].getStoneChain().getChainLength();
-					removeStoneChain( stoneBoard[nr][nc].getStoneChain() );
-					breaths++;
-				}
-			}
-		}
+		newCords = new int[]{ r,c+1 };
+		capturedStones += updateField(breaths, cords, newCords, stoneChain, ret);
 		
 		// conclusion
-		if( stoneChain == null ) stoneBoard[r][c] = new Stone( r,c, breaths );
-		else stoneBoard[r][c] = new Stone( r,c,breaths, stoneChain );
+		if( stoneChain[0] == null ) stoneBoard[r][c] = new Stone( r,c, breaths );
+		else stoneBoard[r][c] = new Stone( r,c,breaths, stoneChain[0] );
 		board[r][c] = currentPlayer;
 		
-		if( capturedStones == 0 ) ret = "0";
-		else ret = Integer.toString(capturedStones) + " " + ret;
+		if( capturedStones == 0 ) ret[0] = "0";
+		else ret[0] = Integer.toString(capturedStones) + " " + ret[0];
 		
-		messageLog = Integer.toString(r) + "," + Integer.toString(c) + " " + ret;
+		messageLog = Integer.toString(r) + "," + Integer.toString(c) + " " + ret[0];
 		
 		if( currentPlayer == 'W' ) currentPlayer = 'B';
 		else currentPlayer = 'W';
 		
-		if( ret.compareTo("0") == 0 ) ret = "1";
-		return ret;
+		if( ret[0].compareTo("0") == 0 ) ret[0] = "1";
+		return ret[0];
+	}
+
+	public boolean checkField( int nr, int nc ) {
+		try {
+			if( board[nr][nc] == 'E' ) return true;
+			else if( board[nr][nc] == currentPlayer ) {
+				if( stoneBoard[nr][nc].getBreaths() > 1 ) return true;
+			}
+			else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 1 ) return true;
+		}
+		catch( ArrayIndexOutOfBoundsException e ) {}
+		
+		return false;
 	}
 	
 	public boolean checkCorrectness(int r, int c) {
 		if( board[r][c] == 'E' ) {
 			
 			// up
-			if ( r != 0 ) {
-				int nr = r-1;
-				int nc = c;
-				
-				if( board[nr][nc] == 'E' ) return true;
-				else if( board[nr][nc] == currentPlayer ) {
-					if( stoneBoard[nr][nc].getBreaths() > 1 ) return true;
-				}
-				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 1 ) return true;
-			}
-			
+			if( checkField(r-1, c) ) return true;
 			// down
-			if ( r != size-1 ) {
-				int nr = r+1;
-				int nc = c;
-				
-				if( board[nr][nc] == 'E' ) return true;
-				else if( board[nr][nc] == currentPlayer ) {
-					if( stoneBoard[nr][nc].getBreaths() > 1 ) return true;
-				}
-				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 1 ) return true;
-			}
-			
+			if( checkField(r+1, c) ) return true;
 			// left
-			if ( c != 0 ) {
-				int nr = r;
-				int nc = c-1;
-				
-				if( board[nr][nc] == 'E' ) return true;
-				else if( board[nr][nc] == currentPlayer ) {
-					if( stoneBoard[nr][nc].getBreaths() > 1 ) return true;
-				}
-				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 1 ) return true;
-			}
-			
+			if( checkField(r, c-1) ) return true;
 			// right
-			if ( c != size-1 ) {
-				int nr = r;
-				int nc = c+1;
-				
-				if( board[nr][nc] == 'E' ) return true;
-				else if( board[nr][nc] == currentPlayer ) {
-					if( stoneBoard[nr][nc].getBreaths() > 1 ) return true;
-				}
-				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 1 ) return true;
-			}
+			if( checkField(r, c+1) ) return true;
 		}
 		return false;
 	}
@@ -226,7 +183,7 @@ public class Board {
 		return messageLog;
 	}
 	
-	public void setExitMessage() {
-		this.messageLog = "exit";
+	public void setMessage(String message) {
+		this.messageLog = message;
 	}
 }

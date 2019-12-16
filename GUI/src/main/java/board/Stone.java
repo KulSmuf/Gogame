@@ -1,40 +1,33 @@
 package board;
 
+import java.util.List;
+
 public class Stone {
 	private int r;
 	private int c;
-	private int breaths;
 	private CompositeStone stoneChain;
 	
-	public Stone(int r, int c, int breaths, CompositeStone stoneChain) {
+	public Stone(int r, int c, List<int[]> breaths, CompositeStone stoneChain) {
 		this.r = r;
 		this.c = c;
-		this.breaths = breaths;
 		this.stoneChain = stoneChain;
 		stoneChain.add(this);
+		stoneChain.addBreaths(breaths);
 	}
 	
-	public Stone(int r, int c, int breaths) {
+	public Stone(int r, int c, List<int[]> breaths) {
 		this.r = r;
 		this.c = c;
-		this.breaths = breaths;
 		this.stoneChain = new CompositeStone(this);
+		stoneChain.addBreaths(breaths);
 	}
 	
-	public void reduceBreath() {
-		breaths--;
-	}
-	
-	public void gainBreath() {
-		breaths++;
-	}
-
 	public CompositeStone getStoneChain() {
 		return stoneChain;
 	}
 	
 	public int getBreaths() {
-		return breaths;
+		return stoneChain.getBreaths();
 	}
 	
 	public void setStoneChain( CompositeStone stoneChain ) {

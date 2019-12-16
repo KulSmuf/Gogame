@@ -69,13 +69,23 @@ class Player implements Runnable {
 	
 	public boolean interpretClientCommand( String clientCommand ) {
 		if( clientCommand.compareTo("exit") == 0 ) {
-			board.setExitMessage();
+			board.setMessage("exit");
 			synchronized( opponent.flag ) {
 				opponent.flag.notify();
 			}
 			return true;
 		}
-		else {
+		else if ( clientCommand.compareTo("pass") == 0 ) {
+			boolean end = board.pass();
+			if( end ) {
+				// TODO: licz wynik i przekaż dalej
+			}
+			else board.setMessage("pass");
+			synchronized( opponent.flag ) {
+				opponent.flag.notify();
+			}
+		}
+		else{
 			int[] cords = parseCords( clientCommand.split(" ") );
 			
 			if( board.checkCorrectness( cords[0], cords[1] ) ) {
