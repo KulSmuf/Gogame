@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class SecondPanel extends JPanel implements ActionListener{
@@ -66,10 +67,10 @@ public class SecondPanel extends JPanel implements ActionListener{
 		add(jency, c);
 		
 		pass = new JButton("Spasuj");
-		//pass.setPreferredSize(new Dimension((int)0.5*width, (int)0.25*height));
+		pass.addActionListener(this);
 		
 		surr = new JButton("Poddaj się");
-		//surr.setPreferredSize(new Dimension((int)0.5*width, (int)0.25*height));
+		surr.addActionListener(this);
 		
 		c.gridx = 0;
 		c.gridy = 3;
@@ -90,16 +91,20 @@ public class SecondPanel extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		//sprawdzaj ktory gracz gra, dodawaj do dwoch roznych list
 		Object source = e.getSource();
-		if(source == pass) {
+		if(source == pass && gui.isActive()==true) {
 			//wyslij klientem
 			//if active czyli czy twoja tura
-			gui.gracz.sendCommand("pass");
+			gui.player.sendCommand("pass");
 			gui.setActive(false);
 			gui.getSPanel().turaPrzeciwnika();
 		}
-		else if(source == surr) {
+		else if(source == surr && gui.isActive()==true) {
 			//wyslij klientem
-			gui.gracz.sendCommand("surr");
+			gui.player.sendCommand("surr");
+			//cos serwer musi zwracac zeby potwierdzic
+			//potem zamknac cala apke
+			//init exit window
+			gui.initExitWindow("surr");
 		}
 		
 		

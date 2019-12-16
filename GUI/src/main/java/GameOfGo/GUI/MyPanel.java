@@ -15,10 +15,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 
 
@@ -28,21 +30,21 @@ public class MyPanel extends JPanel implements ActionListener{
 	private int dim = 0;
 	private int height = 0;
 	private int width = 0;
-	private ArrayList<Line2D> linie = new ArrayList<Line2D>();
+	private ArrayList<Line2D> lines = new ArrayList<Line2D>();
 	//tablica przyciskow
-	ArrayList<JButton> przyciski = new ArrayList<JButton>();
+	ArrayList<JButton> buttons = new ArrayList<JButton>();
 	//kamienie
-	private ArrayList<JButton> kamienie = new ArrayList<JButton>();
+	private ArrayList<JButton> stones = new ArrayList<JButton>();
 	//kamienie przeciwnika
-	private ArrayList<JButton> kamieniep = new ArrayList<JButton>();
+	ArrayList<JButton> opponent_stones = new ArrayList<JButton>();
 	
 	private Color background = new Color(249, 235, 106);
 	
 	//bedzie czytal string od serwera, sam go przetwarzal i dodawal w tym miejscu kamien przeciwnika
-	public void addkamien(String pozycja) {
+	public void addstone(String position) {
 		//parse string
 		//nie uwzgledniamy tych co przeciwnik zbil
-		String[] tokenss = pozycja.split(" ");
+		String[] tokenss = position.split(" ");
 		String[] tokens = tokenss[0].split(",");
 		if(tokens == null) {
 			throw new IllegalArgumentException("zły format");
@@ -54,11 +56,11 @@ public class MyPanel extends JPanel implements ActionListener{
 		}
 		
 		//znalezc odpowiedni przycisk
-		 for(JButton b:przyciski) {
+		 for(JButton b:buttons) {
 			if(x == b.getBounds().x/40-1 && y == b.getBounds().y/40-1) {
 				b.setEnabled(false);
 				b.setVisible(false);
-				kamieniep.add(b);
+				opponent_stones.add(b);
 				repaint();
 			}
 		 
@@ -69,12 +71,12 @@ public class MyPanel extends JPanel implements ActionListener{
 				String[] namiar = tokenss[2+u].split(",");
 				int s = Integer.parseInt(namiar[0]);
 				int r = Integer.parseInt(namiar[1]);
-				for(JButton b:przyciski) {
+				for(JButton b:buttons) {
 					if(s == b.getBounds().x/40-1 && r == b.getBounds().y/40-1) {
 						//usunac moje kamyki i zwolnic miejsce, wlaczyc przyciski
 						b.setEnabled(true);
 						b.setVisible(true);
-						kamienie.remove(b);
+						stones.remove(b);
 						repaint();
 					}
 				 }
@@ -92,22 +94,22 @@ public class MyPanel extends JPanel implements ActionListener{
 	
 			gui.getTimer().cancel();
 		
-		gui.gracz.sendCommand(str+" "+str2);
+		gui.player.sendCommand(str+" "+str2);
 		//if SendCommand=1 przeprowadz ruch, jesli nie to nic nie rob
 		try {
-			while(gui.gracz.hasServerSendCommand() == false) {
+			while(gui.player.hasServerSendCommand() == false) {
 				
 			}
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		String response = gui.gracz.getServerCommand();
+		String response = gui.player.getServerCommand();
 		//JOptionPane.showMessageDialog(getFrame(), response);
 		if(response.equals("1")) {
 			((AbstractButton) source).setEnabled(false);
 			((AbstractButton) source).setVisible(false);
-			this.kamienie.add((JButton) source);
+			this.stones.add((JButton) source);
 			repaint();
 			//wywoluj metode tura przeciwnika
 			//czekaj na ruch przeciwnika, jesli null to znaczy ze wyszedl
@@ -126,19 +128,19 @@ public class MyPanel extends JPanel implements ActionListener{
 				String[] cordinates = tokens[u].split(",");
 				int s = Integer.parseInt(cordinates[0]);
 				int r = Integer.parseInt(cordinates[1]);
-				for(JButton b:przyciski) {
+				for(JButton b:buttons) {
 					if(s == b.getBounds().x/40-1 && r == b.getBounds().y/40-1) {
 						//usunac kamienie przeciwnika i zwolnic miejsce, wlaczyc przyciski
 						b.setEnabled(true);
 						b.setVisible(true);
-						kamieniep.remove(b);
+						opponent_stones.remove(b);
 						//repaint();
 					}
 				 }
 			}
 		((AbstractButton) source).setEnabled(false);
 		((AbstractButton) source).setVisible(false);
-		this.kamienie.add((JButton) source);
+		this.stones.add((JButton) source);
 		repaint();
 		//wywoluj metode tura przeciwnika
 		//czekaj na ruch przeciwnika, jesli null to znaczy ze wyszedl
@@ -178,7 +180,10 @@ public class MyPanel extends JPanel implements ActionListener{
 				ada.setBounds(r*40, k*40, 5, 5);
 				ada.setBackground(background);
 				ada.addActionListener(this);
-				przyciski.add(ada);
+				//co lepiej?
+				//Border emptyBorder = BorderFactory.createEmptyBorder();
+				//ada.setBorder(emptyBorder);
+				buttons.add(ada);
 				this.add(ada);
 			}
 		}
@@ -190,10 +195,10 @@ public class MyPanel extends JPanel implements ActionListener{
 		Graphics2D g2d = (Graphics2D) g;
 		for(int i=1;i<=dim;i++) {
 			Line2D newline = new Line2D.Double(40, i*40, dim*40, i*40);
-			linie.add(newline);
+			lines.add(newline);
 			g2d.draw(newline);
 			Line2D newline2 = new Line2D.Double(i*40, 40, i*40, dim*40);
-			linie.add(newline2);
+			lines.add(newline2);
 			g2d.draw(newline2);
 		}
 		//skalowanie ikon kamieni
@@ -206,7 +211,7 @@ public class MyPanel extends JPanel implements ActionListener{
 		Image newimgw = imagew.getScaledInstance(30, 30,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 		iconw = new ImageIcon(newimgw);
 		//
-		for(JButton s:kamienie) {
+		for(JButton s:stones) {
 			int x = s.getLocation().x - 15;
 			int y = s.getLocation().y - 15;
 			if(gui.isWhichplayer()==true) {
@@ -217,7 +222,7 @@ public class MyPanel extends JPanel implements ActionListener{
 			}
 		}
 			
-		for(JButton p:kamieniep) {
+		for(JButton p:opponent_stones) {
 			int xp = p.getLocation().x - 15;
 			int yp = p.getLocation().y - 15;
 			if(gui.isWhichplayer()==true) {

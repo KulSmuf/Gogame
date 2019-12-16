@@ -1,5 +1,6 @@
 package GameOfGo.GUI;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
@@ -10,10 +11,10 @@ public class MainFrame extends JFrame
 	//private FlowLayout layout;
 	//GridBagConstraints gbc = new GridBagConstraints();
 	private int size = 0;
-	public MainFrame(GUI gui) {
+	public MainFrame(final GUI gui) {
+		//setLayout(new BorderLayout());
 		super("Hello World");
 		this.gui = gui;
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		switch(gui.Getsizeoftheboard()) {
 		case 9:
 			setPreferredSize(new Dimension(800, 440));
@@ -28,29 +29,13 @@ public class MainFrame extends JFrame
 			this.size = 800;
 			break;
 		}
-		/*setLayout(new GridBagLayout());
-		GridBagConstraints gc = new GridBagConstraints();
-		gc.anchor = GridBagConstraints.NORTHWEST;
-		gc.weightx = 1;
-		//gc.weighty = 1;
-		//pierwszy panel
-		//gc.anchor = GridBagConstraints.WEST;
-		//gc.weightx = 1.5;
-		//gc.weighty = 1.5;
-		
-		
-		MyPanel panel = new MyPanel(GUI.this.sizeofboard);
-		panel.setPreferredSize(new Dimension(this.size, this.size));
-		add(panel, gc);
-		*/
-		//drugi panel
-		//gc.weightx = 1;
-		//gc.weighty = 1.5;
-		
-		//gc.gridx = 1;
-		//gc.gridy = 0;
-		
-		//add(new SecondPanel(GUI.this.sizeofboard), gc);
+		this.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        gui.player.sendCommand("surr");
+		        System.exit(0);
+		    }
+		});
 	}
 }
 

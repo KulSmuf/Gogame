@@ -3,6 +3,7 @@ package GameOfGo.GUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -26,6 +27,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -43,8 +45,9 @@ public class GUI {
     TimerTask task = new coms_to_gui(this); 
     Date date = new Date();
 	
+	JDialog dialog;
 	
-	
+	SetSizeFrame frame;
 	
 	public Timer getTimer() {
 		if(this.timer != null) {
@@ -64,11 +67,11 @@ public class GUI {
 	//to trzeba zmienic na true przy rozpoczeciu gry
 	private boolean active;
 	//instancja klienta
-	public Client gracz;
+	public Client player;
 	
 	void getClient() {
 		try {
-			gracz = new Client();
+			player = new Client();
 		}
 		catch(Exception e) {
 			throw new RuntimeException(e);
@@ -78,6 +81,8 @@ public class GUI {
 	private JFrame pierwsza;
 	//waitingframe
 	private JFrame waiting;
+	//mainframe
+	private JFrame main;
 	//mypanel
 	private MyPanel panel;
 	//secondpanel
@@ -95,6 +100,14 @@ public class GUI {
 	
 	public MyPanel getMPanel() {
 		return this.panel;
+	}
+	
+	public void setDialog(JDialog p) {
+		this.dialog = p;
+	}
+	
+	public JDialog getDialog() {
+		return this.dialog;
 	}
 	
 	public void setWFrame(JFrame w) {
@@ -121,8 +134,12 @@ public class GUI {
 		return this.active;
 	}
 	
-	public void setFrame(JFrame frame) {
-		this.pierwsza = frame;
+	public void setMFrame(JFrame frame) {
+		this.main = frame;
+	}
+	
+	public JFrame getMFrame() {
+		return this.main;
 	}
 	
 	public SecondPanel getSPanel() {
@@ -137,6 +154,10 @@ public class GUI {
 		return this.pierwsza;
 	}
 	
+	public void setFrame(JFrame frame) {
+		this.pierwsza = frame;
+	}
+	
 	public int Getsizeoftheboard() {
 		return this.sizeofboard;
 	}
@@ -149,95 +170,65 @@ public class GUI {
 		return this.whichplayer;
 	}
 
-
-
-
 	public void setWhichplayer(boolean player) {
 		this.whichplayer = player;
+	}	
+	
+	public void initWaitingWindow() {
+		final JWindow window = new JWindow(this.frame);
+		window.getContentPane().add(new JLabel("Oczkiwanie na serwer..."), BorderLayout.NORTH);
+		JButton b = new JButton("Zrezygnuj");
+		window.getContentPane().add(b, BorderLayout.SOUTH);
+		b.addActionListener(new ActionListener() {
+		      public void actionPerformed(ActionEvent e) {
+		        window.setVisible(false);
+		      }
+		    });
+	   window.pack();
+	   window.setBounds(50,50,200,200);
+	   window.setVisible(true);
 	}
 	
 	
-	//przyciski
-	private boolean wgracz = false;
-	private boolean wbot = false;
-	private boolean w9 = false;
-	private boolean w13 = false;
-	private boolean w19 = false;
-
-
-	public boolean isWgracz() {
-		return wgracz;
-	}
-
-
-
-
-	public boolean isWbot() {
-		return wbot;
-	}
-
-
-
-
-	public boolean isW9() {
-		return w9;
-	}
-
-
-
-
-	public boolean isW13() {
-		return w13;
-	}
-
-
-
-
-	public boolean isW19() {
-		return w19;
-	}
-
-
-
-
-	public void setWgracz(boolean wgracz) {
-		this.wgracz = wgracz;
-	}
-
-
-
-
-	public void setWbot(boolean wbot) {
-		this.wbot = wbot;
-	}
-
-
-
-
-	public void setW9(boolean w9) {
-		this.w9 = w9;
-	}
-
-
-
-
-	public void setW13(boolean w13) {
-		this.w13 = w13;
-	}
-
-
-
-
-	public void setW19(boolean w19) {
-		this.w19 = w19;
+	
+	
+	public void initExitWindow(String store) {
+	
+        //wynik postaci XX:YY
+        if(store.equals("exit")) {
+        	JOptionPane.showMessageDialog(getMFrame(),
+        	        "Przeciwnik się poddał");
+        	    	System.exit(0);
+        }
+        else if(store.equals("surr")) {
+        	JOptionPane.showMessageDialog(getMFrame(),
+        	        "Poddałeś się");
+        	    	System.exit(0);
+        }
+        else {
+         String[] didyouwin = store.split(" ");
+         String[] score = store.split(",");
+         String points = score[0];
+         String points2 = score[1];
+         if(Integer.parseInt(points)>Integer.parseInt(points2)) {
+        	 JOptionPane.showMessageDialog(getMFrame(),
+         	        "Wygrałeś z wynikiem "+points+"do "+points2);
+         	    	System.exit(0);
+         }
+         else {
+        	 JOptionPane.showMessageDialog(getMFrame(),
+          	        "Przegrałeś z wynikiem "+points+"do "+points2);
+          	    	System.exit(0);
+         }
+	    }
 	}
 	
-	//initfirstframe
-	private static int fwidth;
-	private static int fheight;
+	
+	
 	public void initFirstFrame() {
 		//init okna wyboru
-		JFrame one = new SetSizeFrame();
+		JFrame one = new SetSizeFrame(this);
+		frame = (SetSizeFrame) one;
 		//fwidth = one.getWidth();
 		//fheight = one.getHeight();
 		one.setLayout(new GridLayout());
@@ -251,7 +242,7 @@ public class GUI {
 		//metoda GUI po zrobieniu ruchu przez przeciwnika
 		//przekazuje string z lokacja kamienia przeciwnika
 		public void zrobRuch(String namiary) {
-			this.panel.addkamien(namiary);
+			this.panel.addstone(namiary);
 			getSPanel().turaGracza();
 			setActive(true);
 			
@@ -259,8 +250,10 @@ public class GUI {
 	
 	//glowne okno
 	public void initMainFrame() {
+		//GUI.this.getDialog().dispose();
 		GUI.this.getFrame().dispose();
 		JFrame main = new MainFrame(this);
+		//add frame
 		
 		//main.setSize(new Dimension(650,600));
 		main.setLayout(new GridLayout(0,2));

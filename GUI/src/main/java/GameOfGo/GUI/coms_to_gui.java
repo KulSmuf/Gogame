@@ -14,16 +14,21 @@ public class coms_to_gui extends TimerTask
 
 	public void run() {
 		try {
-			if(gui.gracz.hasServerSendCommand()) {
-				odp = gui.gracz.getServerCommand();
-				gui.zrobRuch(odp);
+			if(gui.player.hasServerSendCommand()) {
+				odp = gui.player.getServerCommand();
+				if(odp.contains("exit")){
+				 //konczy sie gra
+					gui.initExitWindow(odp);
+				}
+				else {
+				//to byl ruch
+				 gui.zrobRuch(odp);
+				}
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block-
 			e.printStackTrace();
 		}
-		//if na wiadomosc przy poddaniu i wygraniu i przegraniu
-		//zrobRuch(odp);
 		
 	}
 	

@@ -1,5 +1,6 @@
 package GameOfGo.GUI;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -13,6 +14,7 @@ import java.util.TimerTask;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class FirstPanel extends JPanel implements ActionListener{
@@ -163,24 +165,57 @@ public class FirstPanel extends JPanel implements ActionListener{
 				zkimgram = "p";
 			}
 			gui.getClient();
-			gui.gracz.sendCommand(rozmiar+" "+zkimgram);
-			WaitingFrame okno = new WaitingFrame();
-			gui.setWFrame(okno);
+			gui.player.sendCommand(rozmiar+" "+zkimgram);
+			
+			gui.initWaitingWindow();
+			/*
+			JFrame okno = new JFrame();
+			JPanel panel = new JPanel(new BorderLayout());
+			panel.setPreferredSize(new Dimension(400,400));
+			JLabel oczekiwanie = new JLabel("Oczekiwanie na serwer");
+			oczekiwanie.setSize(new Dimension(50,50));
+			panel.add(oczekiwanie, BorderLayout.NORTH);
+			
+			JButton zrezygnuj = new JButton("Zrezygnuj");
+			zrezygnuj.setSize(new Dimension(50,50));
+			panel.add(zrezygnuj, BorderLayout.SOUTH);
+			
+			zrezygnuj.addActionListener(new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	                gui.gracz.sendCommand("quit");
+	                //wyjscie z aplikacji
+	                gui.getWframe().dispose();
+	                System.exit(0);
+	            }
+	        });
+			
+			
+			okno.add(panel);
+			okno.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			//okno.setLocationRelativeTo(null);
+			okno.pack();
+			okno.setVisible(true);
+			//okno.setVisible(true);
+			//gui.setWFrame(okno);
 			//okno.add(new WaitingPanel());
 			//okno.setSize(new Dimension(300,300));
 			//okno.pack();
 			//okno.setLocationRelativeTo(null);
 			//okno.setVisible(true);
+			 *
+			*/
+			gui.getFrame().setTitle("Oczekiwanie na serwer...");
 			//zaleznie od tego co przyjdzie, czy mozesz przyjsc cos innego niz tak?
 			try {
-				while(gui.gracz.hasServerSendCommand() == false) {
+				while(gui.player.hasServerSendCommand() == false) {
 					//
 				}
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-				if(gui.gracz.getServerCommand().equals("B")) {
+				if(gui.player.getServerCommand().equals("B")) {
 					gui.setWhichplayer(true);
 					gui.setActive(false);
 					//odpal Timera
@@ -194,7 +229,7 @@ public class FirstPanel extends JPanel implements ActionListener{
 					gui.setWhichplayer(false);
 					gui.setActive(true);
 				}
-				okno.setVisible(false);
+				//okno.setVisible(false);
 				gui.initMainFrame();
 			}
 			
