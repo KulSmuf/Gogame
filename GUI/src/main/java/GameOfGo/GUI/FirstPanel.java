@@ -214,7 +214,7 @@ public class FirstPanel extends JPanel implements ActionListener{
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-				if(gui.player.getServerCommand().equals("B")) {
+				if(gui.player.getServerCommand().equals("W")) {
 					gui.setWhichplayer(true);
 					gui.setActive(false);
 					//odpal Timera
