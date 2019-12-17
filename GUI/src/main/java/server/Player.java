@@ -149,7 +149,6 @@ class Player implements Runnable {
 		// configuration if pvp game
 		if( StartConfiguration[1].compareTo("p") == 0 ) {
 			
-			
 			synchronized(myServer.waitingPlayers) {
 				if( myServer.waitingPlayers.getWaitingPlayer(boardSize) == null ) myServer.waitingPlayers.addWaitingPlayer(this, boardSize);
 				else {
@@ -187,7 +186,13 @@ class Player implements Runnable {
 			board = new Board( boardSize );
 			//opponent = new Bot();
 			(new Thread(opponent)).start();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			opponent.setOpponent(this, board);
+			sendCommand( Character.toString(color) );
 			startGame();
 		}
 	}
