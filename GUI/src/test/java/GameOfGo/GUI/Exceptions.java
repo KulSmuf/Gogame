@@ -1,8 +1,13 @@
 package GameOfGo.GUI;
 
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.awt.event.ActionEvent;
 
 import org.junit.Test;
 
@@ -10,6 +15,7 @@ public class Exceptions {
 	
 	GUI gui = mock(GUI.class);
 	MyPanel p;
+	SecondPanel panel;
 	//sprawdza czy mozna nic nie przekazac
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldThrownIllegalArgumentExceptionOnWrongParameters() {
@@ -24,6 +30,22 @@ public class Exceptions {
 		p = new MyPanel(9,gui);
 	    p.addstone("20,20");
 	}
+	
+	@Test
+	public void test_gui1() {
+	       assertNull(gui.getTimer());
+	}
+	
+	@Test
+	public void test_actionP() {
+		panel = new SecondPanel(9,gui);
+		when(gui.isActive()).thenReturn(true);
+		panel.actionPerformed(new ActionEvent(panel,0,"pass"));
+		
+		
+	}
+	
+	
 	
 	
 	

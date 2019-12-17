@@ -26,7 +26,7 @@ import javax.swing.border.Border;
 
 public class MyPanel extends JPanel implements ActionListener{
 	GUI gui;
-	
+	int hostages = 0;
 	private int dim = 0;
 	private int height = 0;
 	private int width = 0;
@@ -34,7 +34,7 @@ public class MyPanel extends JPanel implements ActionListener{
 	//tablica przyciskow
 	ArrayList<JButton> buttons = new ArrayList<JButton>();
 	//kamienie
-	private ArrayList<JButton> stones = new ArrayList<JButton>();
+	ArrayList<JButton> stones = new ArrayList<JButton>();
 	//kamienie przeciwnika
 	ArrayList<JButton> opponent_stones = new ArrayList<JButton>();
 	
@@ -65,6 +65,7 @@ public class MyPanel extends JPanel implements ActionListener{
 			}
 		 
 		}
+		 //zbija moje kamienie
 		if(tokenss[1] != "0") {
 			int ile = Integer.parseInt(tokenss[1]);
 			for(int u=0;u<ile;u++) {
@@ -105,7 +106,6 @@ public class MyPanel extends JPanel implements ActionListener{
 			e1.printStackTrace();
 		}
 		String response = gui.player.getServerCommand();
-		//JOptionPane.showMessageDialog(getFrame(), response);
 		if(response.equals("1")) {
 			((AbstractButton) source).setEnabled(false);
 			((AbstractButton) source).setVisible(false);
@@ -122,7 +122,11 @@ public class MyPanel extends JPanel implements ActionListener{
 			timer.scheduleAtFixedRate(task, date, 2000);
 			gui.setTimer(timer);
 		}
+		else if(response.contains("exit")) {
+			gui.initExitWindow(response);
+		}
 		else if(!response.equals("0") && !response.equals("1") && response.isEmpty()==false) {
+			hostages=0;
 			String[] tokens = response.split(" ");
 			for(int u=1;u<=Integer.parseInt(tokens[0]);u++) {
 				String[] cordinates = tokens[u].split(",");
@@ -134,6 +138,7 @@ public class MyPanel extends JPanel implements ActionListener{
 						b.setEnabled(true);
 						b.setVisible(true);
 						opponent_stones.remove(b);
+						hostages++;
 						//repaint();
 					}
 				 }
@@ -147,6 +152,7 @@ public class MyPanel extends JPanel implements ActionListener{
 		//tura Przeciwnika wiec nic nie mozesz zrobic
 		gui.setActive(false);
 		gui.getSPanel().turaPrzeciwnika();
+		gui.getSPanel().update_host(hostages);
 		Timer timer = new Timer();
 		Date date = new Date();
 		TimerTask task = new coms_to_gui(this.gui); 
@@ -202,11 +208,11 @@ public class MyPanel extends JPanel implements ActionListener{
 			g2d.draw(newline2);
 		}
 		//skalowanie ikon kamieni
-		ImageIcon iconb = new ImageIcon("black.png"); // load the image to a imageIcon
+		ImageIcon iconb = new ImageIcon("src/black.png"); // load the image to a imageIcon
 		Image imageb = iconb.getImage(); // transform it 
 		Image newimgb = imageb.getScaledInstance(30, 30,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 		iconb = new ImageIcon(newimgb);
-		ImageIcon iconw = new ImageIcon("white.png"); // load the image to a imageIcon
+		ImageIcon iconw = new ImageIcon("src/white.png"); // load the image to a imageIcon
 		Image imagew = iconw.getImage(); // transform it 
 		Image newimgw = imagew.getScaledInstance(30, 30,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 		iconw = new ImageIcon(newimgw);

@@ -22,7 +22,9 @@ public class SetSizeFrame extends JFrame
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-		        gui.player.sendCommand("exit");
+		    	if(gui.player != null) {
+		         gui.player.sendCommand("exit");
+		    	}
 		        System.exit(0);
 		    }
 		});

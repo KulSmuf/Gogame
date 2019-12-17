@@ -15,7 +15,9 @@ public class SecondPanel extends JPanel implements ActionListener{
 	JButton surr;
 	JLabel kogotura2;
 	JLabel kogotura;
+	JLabel number_of_host;
 	
+	int number_hosts=0;
 	
 	GUI gui;
 	
@@ -50,6 +52,9 @@ public class SecondPanel extends JPanel implements ActionListener{
 		
 		JLabel jency = new JLabel("Ilosc jencow");
 		//jency.setPreferredSize(new Dimension(width, (int)0.25*height));
+		
+		number_of_host = new JLabel("0");
+		
 		c.weighty = 0.5;
 		c.gridx = 0;
 		c.gridy = 0;
@@ -65,6 +70,11 @@ public class SecondPanel extends JPanel implements ActionListener{
 		c.gridy = 2;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		add(jency, c);
+		
+		c.gridx = 1;
+		c.gridy = 2;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		add(number_of_host, c);
 		
 		pass = new JButton("Spasuj");
 		pass.addActionListener(this);
@@ -98,9 +108,9 @@ public class SecondPanel extends JPanel implements ActionListener{
 			gui.setActive(false);
 			gui.getSPanel().turaPrzeciwnika();
 		}
-		else if(source == surr && gui.isActive()==true) {
+		else if(source == surr) {
 			//wyslij klientem
-			gui.player.sendCommand("surr");
+			gui.player.sendCommand("exit");
 			//cos serwer musi zwracac zeby potwierdzic
 			//potem zamknac cala apke
 			//init exit window
@@ -118,6 +128,11 @@ public class SecondPanel extends JPanel implements ActionListener{
 	public void turaGracza() {
 		kogotura.setVisible(false);
 		kogotura2.setVisible(true);
+	}
+	
+	public void update_host(int new_hosts) {
+		number_hosts += new_hosts;
+		number_of_host.setText(Integer.toString(number_hosts));
 	}
 	
 	

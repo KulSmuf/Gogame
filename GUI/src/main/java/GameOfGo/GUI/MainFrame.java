@@ -11,6 +11,10 @@ public class MainFrame extends JFrame
 	//private FlowLayout layout;
 	//GridBagConstraints gbc = new GridBagConstraints();
 	private int size = 0;
+	
+	public int getSiza() {
+		return this.size;
+	}
 	public MainFrame(final GUI gui) {
 		//setLayout(new BorderLayout());
 		super("Hello World");
@@ -32,7 +36,7 @@ public class MainFrame extends JFrame
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-		        gui.player.sendCommand("surr");
+		        gui.player.sendCommand("exit");
 		        System.exit(0);
 		    }
 		});

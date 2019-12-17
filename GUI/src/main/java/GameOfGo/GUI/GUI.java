@@ -74,7 +74,9 @@ public class GUI {
 			player = new Client();
 		}
 		catch(Exception e) {
-			throw new RuntimeException(e);
+			 JOptionPane.showMessageDialog(getFrame(),
+	         	        "Brak odpowiedzi od serwera");
+	         	    	System.exit(0);
 		}
 	}
 	//firstframe
@@ -174,20 +176,6 @@ public class GUI {
 		this.whichplayer = player;
 	}	
 	
-	public void initWaitingWindow() {
-		final JWindow window = new JWindow(this.frame);
-		window.getContentPane().add(new JLabel("Oczkiwanie na serwer..."), BorderLayout.NORTH);
-		JButton b = new JButton("Zrezygnuj");
-		window.getContentPane().add(b, BorderLayout.SOUTH);
-		b.addActionListener(new ActionListener() {
-		      public void actionPerformed(ActionEvent e) {
-		        window.setVisible(false);
-		      }
-		    });
-	   window.pack();
-	   window.setBounds(50,50,200,200);
-	   window.setVisible(true);
-	}
 	
 	
 	
@@ -206,7 +194,7 @@ public class GUI {
         	    	System.exit(0);
         }
         else {
-         String[] didyouwin = store.split(" ");
+         //String[] didyouwin = store.split(" ");
          String[] score = store.split(",");
          String points = score[0];
          String points2 = score[1];
@@ -241,11 +229,17 @@ public class GUI {
 	
 		//metoda GUI po zrobieniu ruchu przez przeciwnika
 		//przekazuje string z lokacja kamienia przeciwnika
-		public void zrobRuch(String namiary) {
-			this.panel.addstone(namiary);
-			getSPanel().turaGracza();
-			setActive(true);
-			
+		public void makeMove(String namiary) {
+			if(namiary.equals("pass")) {
+				getSPanel().turaGracza();
+				setActive(true);
+			}
+			else {
+				this.panel.addstone(namiary);
+				getSPanel().turaGracza();
+				setActive(true);
+			}
+		
 		}
 	
 	//glowne okno

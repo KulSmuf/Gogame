@@ -185,7 +185,7 @@ class Player implements Runnable {
 		}
 		else {
 			board = new Board( boardSize );
-			opponent = new Bot();
+			//opponent = new Bot();
 			(new Thread(opponent)).start();
 			opponent.setOpponent(this, board);
 			startGame();

@@ -167,7 +167,6 @@ public class FirstPanel extends JPanel implements ActionListener{
 			gui.getClient();
 			gui.player.sendCommand(rozmiar+" "+zkimgram);
 			
-			gui.initWaitingWindow();
 			/*
 			JFrame okno = new JFrame();
 			JPanel panel = new JPanel(new BorderLayout());

@@ -22,7 +22,7 @@ public class coms_to_gui extends TimerTask
 				}
 				else {
 				//to byl ruch
-				 gui.zrobRuch(odp);
+				 gui.makeMove(odp);
 				}
 			}
 		} catch (IOException e) {
