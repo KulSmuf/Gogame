@@ -176,7 +176,7 @@ class Player implements Runnable {
 				}
 			}
 			else {
-				board = new Board(9);
+				board = new Board( boardSize );
 				color = 'W';
 				opponent.setOpponent(this, board);
 			}
@@ -184,7 +184,7 @@ class Player implements Runnable {
 			startGame();
 		}
 		else {
-			board = new Board(9);
+			board = new Board( boardSize );
 			opponent = new Bot();
 			(new Thread(opponent)).start();
 			opponent.setOpponent(this, board);

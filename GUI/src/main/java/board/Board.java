@@ -6,7 +6,7 @@ import java.util.List;
 public class Board {
 	
 	private String messageLog;
-	
+	public int size;
 	private char currentPlayer;
 	private char[][] board;
 	private Stone[][] stoneBoard;
@@ -14,6 +14,7 @@ public class Board {
 	private int[] ko = null;
 
 	public Board( int size ){
+		this.size = size;
 		board = new char[size][size];
 		stoneBoard = new Stone[size][size];
 		currentPlayer = 'B';
