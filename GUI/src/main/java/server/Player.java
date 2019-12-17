@@ -16,13 +16,13 @@ class Player implements Runnable {
 	
 	private Server myServer;
 	
-	private Board board;
-	private Player opponent;
-	private char color = 'B';
+	protected  Board board;
+	protected Player opponent;
+	protected char color = 'B';
 	
 	public Object flag = new Object();
 	
-	private Message message = new Message(" ");
+	protected Message message = new Message(" ");
 	
 	public Player(Socket socket, Server myServer) {
 		try {
@@ -33,6 +33,10 @@ class Player implements Runnable {
 			System.out.println("Error: " + e);
 		}
 		this.myServer = myServer;
+	}
+	
+	public Player() {
+		// for Bot
 	}
 	
 	public void setOpponent( Player opponent, Board board ) {
@@ -78,6 +82,12 @@ class Player implements Runnable {
 		else if ( clientCommand.compareTo("pass") == 0 ) {
 			boolean end = board.pass();
 			if( end ) {
+				board.setMessage("exit 50:50");
+				sendCommand("exit 50:50");
+				synchronized( opponent.flag ) {
+					opponent.flag.notify();
+				}
+				return true;
 				// TODO: licz wynik i przekaż dalej
 			}
 			else board.setMessage("pass");
@@ -99,7 +109,7 @@ class Player implements Runnable {
 		return false;
 	}
 	
-	private void startGame() {
+	protected void startGame() {
 				
 		Thread clientListener = new ClientListener();
 		Thread opponentListener = new OpponentListener();
@@ -174,7 +184,11 @@ class Player implements Runnable {
 			startGame();
 		}
 		else {
-			// TODO: bot
+			board = new Board(9);
+			opponent = new Bot();
+			(new Thread(opponent)).start();
+			opponent.setOpponent(this, board);
+			startGame();
 		}
 	}
 	
