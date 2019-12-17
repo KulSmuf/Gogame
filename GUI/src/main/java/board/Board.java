@@ -187,6 +187,14 @@ public class Board {
 	public String getMessageLog() {
 		return messageLog;
 	}
+
+	public Stone[][] getStones(){
+		return stoneBoard;
+	}
+	
+	public char getStoneColor( Stone stone ) {
+		return board[  stone.getRow() ][ stone.getColumn() ];
+	}
 	
 	public void setMessage(String message) {
 		this.messageLog = message;
