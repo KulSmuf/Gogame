@@ -239,6 +239,48 @@ public class Bot extends Player {
 		}
 		return false;
 	}
+
+	public int checkNumberOfFree( int[] cords ) {
+		int free = 0;
+		int[] direction = new int[] {1,0};
+		
+		for(int i=0;i<4;i++) {
+			try {
+				Stone neighbour = getStone( addVector( cords, direction ) );
+				if( neighbour == null ) free++;
+			}
+			catch( ArrayIndexOutOfBoundsException e ) {}
+			turn( direction );
+		}
+		return free;
+	}
+	
+	public boolean tryDefence(){
+		
+		List< int[] > posMoves = new ArrayList<int[]>();
+		
+		for( int i=0; i<board.getStones().length; i++ ) {
+			for( int j=0;j<board.getStones().length;j++ ) {
+				if( board.checkCorrectness( i , j  ) ) posMoves.add( new int[] {i,j} );
+			}
+		}
+		
+		SortMovesByBreaths sort = new SortMovesByBreaths();
+		posMoves.sort(sort);
+		
+		for( int[] move: posMoves ) {
+			if( board.checkCorrectness( move[0],move[1] ) && checkNumberOfFree(move) > 2 ) {
+				String changes = board.makeMove( move[0],move[1] );
+				applyChanges( changes, move );
+				synchronized( opponent.flag ) {
+					opponent.flag.notify();
+				}
+				return true;
+			}
+		}
+
+		return false;
+	}
 	
 	public boolean attack() {
 		board.getColor();
@@ -302,6 +344,9 @@ public class Bot extends Player {
 			
 			if( finished ) return false;
 		}
+		
+		if( tryDefence() ) return false;
+		
 		return pass();
 	}
 	

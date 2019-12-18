@@ -12,21 +12,11 @@ public class sandbox {
 	
 	@Test
 	public void sandboxTest() {
-		
-		int[] test = {1,2};
-		test[-1] =1;
-		
-		List<int[]> board = new ArrayList<int[]>();
-		
-		int[] add= {1,2};
-		add = null;
-		add = new int[]{1,2};
-		board.add( add );
-		int[] add2= {1,2};
-		boolean contain = false;
-		for( int[] cords : board ) {
-			if( contain = Arrays.equals(cords,add2) ) break;
-		}
-		System.out.println(contain);
+		char test = 0;
+		int a = 0;
+		char test2 = (char) a++;
+		if( test == test2 ) System.out.println("1 true");
+		test = 1;
+		if( test == test2 ) System.out.println("2 true");
 	}
 }
