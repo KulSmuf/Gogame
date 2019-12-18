@@ -194,8 +194,8 @@ public class GUI {
         	    	System.exit(0);
         }
         else {
-         //String[] didyouwin = store.split(" ");
-         String[] score = store.split(",");
+         String[] didyouwin = store.split(" ");
+         String[] score = didyouwin[1].split(":");
          String points = score[0];
          String points2 = score[1];
          if(Integer.parseInt(points)>Integer.parseInt(points2)) {
