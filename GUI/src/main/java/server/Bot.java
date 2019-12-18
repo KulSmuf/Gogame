@@ -308,11 +308,20 @@ public class Bot extends Player {
 			while( moveList.size() > 0 ) {
 				int n = RNG.nextInt( moveList.size() );
 				if( finished = board.checkCorrectness( moves[n][0] , moves[n][1]  ) ) {
+					
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					
 					String changes = board.makeMove( moves[n][0], moves[n][1] );
 					applyChanges( changes, moves[n] );
+					
 					synchronized( opponent.flag ) {
 						opponent.flag.notify();
 					}
+					
 					break;
 				}
 				else {

@@ -121,9 +121,9 @@ class Player implements Runnable {
 				try {
 					message.wait();
 				} catch (InterruptedException e) {
-					System.out.println("Player interrupted waiting for message");
 				}
 			}
+			
 			
 			if( message.getMessage().compareTo("fromClient") == 0 ) {
 				if( interpretClientCommand( getClientCommand() ) ) return;

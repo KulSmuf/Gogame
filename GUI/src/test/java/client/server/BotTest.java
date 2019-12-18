@@ -28,7 +28,7 @@ public class BotTest {
 		//   Ruch gracza pierwszego
 		String move = "0 0";
 		player.sendCommand(move);
-		while( !player.hasServerSendCommand() );
+		while( !player.hasServerSendCommand() ); System.out.println("formy move");
 		assertEquals( "1" , player.getServerCommand());
 		
 		while( !player.hasServerSendCommand() );
@@ -36,7 +36,7 @@ public class BotTest {
 		
 		move = "2 2";
 		player.sendCommand(move);
-		while( !player.hasServerSendCommand() );
+		while( !player.hasServerSendCommand() ); System.out.println("formy move");
 		assertEquals( "1" , player.getServerCommand());
 		
 		while( !player.hasServerSendCommand() );
@@ -44,7 +44,7 @@ public class BotTest {
 		
 		move = "2 1";
 		player.sendCommand(move);
-		while( !player.hasServerSendCommand() );
+		while( !player.hasServerSendCommand() );  System.out.println("formy move");
 		assertEquals( "1" , player.getServerCommand());
 		
 		while( !player.hasServerSendCommand() );
@@ -52,7 +52,7 @@ public class BotTest {
 		
 		move = "4 4";
 		player.sendCommand(move);
-		while( !player.hasServerSendCommand() );
+		while( !player.hasServerSendCommand() ); System.out.println("formy move");
 		assertEquals( "1" , player.getServerCommand());
 		
 		while( !player.hasServerSendCommand() );
