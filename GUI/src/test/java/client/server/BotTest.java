@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import client.Client;
+import server.Bot;
 
 public class BotTest {
 

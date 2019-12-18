@@ -45,7 +45,7 @@ public class Bot extends Player {
 			}
 			
 			if( interpretPlayerMove() ) return;
-			makeMove();
+			if( makeMove() ) return;
 		}
 	}
 
@@ -78,14 +78,14 @@ public class Bot extends Player {
 	
 	public int checkNumberOfBreaths( int[] cords ) {
 		List<int[]> breaths = new ArrayList<int[]>();
-		int[] direction = new int[] {0,1};
-		turn( direction );
+		int[] direction = new int[] {1,0};
+		
 		for(int i=0;i<4;i++) {
 			try {
 				Stone neighbour = getStone( addVector( cords, direction ) );
 				if( neighbour == null ) breaths.add( addVector( cords, direction ) );
 				else if( board.getStoneColor( neighbour ) == 'W' ) {
-					System.out.println(" sąsiad good for cord: " + cords[0] + " " + cords[1]);
+					System.out.println(" sąsiad good for cord: " + cords[0] + " " + cords[1] + " in " + neighbour.getRow() + " " + neighbour.getColumn() );
 					List<int[]> newBreaths = new ArrayList<int[]>();
 					for( int[] breath: neighbour.getStoneChain().getBreathArray() ) {
 						
@@ -100,19 +100,26 @@ public class Bot extends Player {
 					breaths.addAll( newBreaths );
 				}
 			}
-			catch( ArrayIndexOutOfBoundsException e ) {
-				
-			}
+			catch( ArrayIndexOutOfBoundsException e ) {}
+			turn( direction );
 		}
 		return breaths.size();
 	}
 	
 	public boolean tryProtect( int[] cords ) {
 		
+		System.out.println("try to protect");
+		
 		int[] possibleMove = getStone( cords ).getStoneChain().getBreathArray().get(0);
 		int breaths = checkNumberOfBreaths(possibleMove);
 		
-		if( breaths > 2 ) board.makeMove(possibleMove[0], possibleMove[1]);
+		if( breaths > 2 ) {
+			String changes = board.makeMove( possibleMove[0], possibleMove[1] );
+			applyChanges( changes, possibleMove );
+			synchronized( opponent.flag ) {
+				opponent.flag.notify();
+			}
+		}
 		return breaths > 2;
 	}
 	
@@ -126,10 +133,9 @@ public class Bot extends Player {
 			if( breaths != chain.getBreaths() ) {
 				breaths = chain.getBreaths();
 				if( listtosplit.size() > 0 ) {
-					Object[] tableOb = listtosplit.toArray();
-					CompositeStone[] table = new CompositeStone[ tableOb.length ];
-					for( int i=0; i< tableOb.length; i++ ) {
-						table[i] = (CompositeStone) tableOb[i];
+					CompositeStone[] table = new CompositeStone[ listtosplit.size() ];
+					for( int i=0; i< listtosplit.size(); i++ ) {
+						table[i] = listtosplit.get(i);
 					}
 					
 					splittedList.add(  table );
@@ -139,12 +145,12 @@ public class Bot extends Player {
 			listtosplit.add(chain);
 		}
 		if( listtosplit.size() > 0 ) {
-			Object[] tableOb = listtosplit.toArray();
-			CompositeStone[] table = new CompositeStone[ tableOb.length ];
-			for( int i=0; i< tableOb.length; i++ ) {
-				table[i] = (CompositeStone) tableOb[i];
+			CompositeStone[] table = new CompositeStone[ listtosplit.size() ];
+			for( int i=0; i< listtosplit.size(); i++ ) {
+				table[i] = listtosplit.get(i);
 			}
-			splittedList.add( table );
+			
+			splittedList.add(  table );
 		}
 		
 		return splittedList;
@@ -154,16 +160,15 @@ public class Bot extends Player {
 		List< int[][] > splittedList = new ArrayList< int[][] >();
 		List< int[] > listtosplit = new ArrayList< int[] >();
 		
-		int breaths = 0;
+		int breaths = -1;
 		
 		for( int[] move: list ) {
 			if( breaths != checkNumberOfBreaths( move ) ) {
 				breaths = checkNumberOfBreaths( move );
 				if( listtosplit.size() > 0 ) {
-					Object[] tableOb = listtosplit.toArray();
-					int[][] table = new int[ tableOb.length ][];
-					for( int i=0; i< tableOb.length; i++ ) {
-						table[i] = (int[]) tableOb[i];
+					int[][] table = new int[ listtosplit.size() ][];
+					for( int i=0; i< listtosplit.size(); i++ ) {
+						table[i] = listtosplit.get(i);
 					}
 					splittedList.add( table );
 					listtosplit.clear();
@@ -172,10 +177,9 @@ public class Bot extends Player {
 			listtosplit.add(move);
 		}
 		if( listtosplit.size() > 0 ) {
-			Object[] tableOb = listtosplit.toArray();
-			int[][] table = new int[ tableOb.length ][];
-			for( int i=0; i< tableOb.length; i++ ) {
-				table[i] = (int[]) tableOb[i];
+			int[][] table = new int[ listtosplit.size() ][];
+			for( int i=0; i< listtosplit.size(); i++ ) {
+				table[i] = listtosplit.get(i);
 			}
 			splittedList.add( table );
 		}
@@ -185,12 +189,19 @@ public class Bot extends Player {
 	
 	public List<int[][]> getMovesByBreaths( CompositeStone[] chains ){
 		List< int[] > moves = new ArrayList< int[] >();
+		
 		for(int i=0 ; i<chains.length; i++ ) {
 			moves.addAll( chains[i].getBreathArray() );
 		}
-		
+		System.out.println( " all chains breaths: " + moves.size() );
 		SortMovesByBreaths sort = new SortMovesByBreaths();
 		moves.sort(sort);
+		
+		System.out.print(" sorted moves: ");
+		for( int[] move: moves ) {
+			System.out.print(move[0] + " " + move[1] + " ");
+		}
+		System.out.println();
 		
 		return  splitByMostBreaths(moves);
 	}
@@ -213,19 +224,28 @@ public class Bot extends Player {
 		}
 	}
 	
-	public void pass() {
-		board.pass();
+	public boolean pass() {
+		if( board.pass() ) {
+			board.setMessage("exit 50,50");
+			synchronized( opponent.flag ) {
+				opponent.flag.notify();
+			}
+			return true;
+		}
 		board.setMessage("pass");
+		synchronized( opponent.flag ) {
+			opponent.flag.notify();
+		}
+		return false;
 	}
 	
-	public void attack() {
+	public boolean attack() {
+		board.getColor();
+		
 		List< int[][] > possibleMoves = new ArrayList<int[][]>();
 		List< CompositeStone > enemyStones = new ArrayList<CompositeStone>();
 		
-		if( this.enemyStones.size() == 0 ) {
-			pass();
-			return;
-		}
+		if( this.enemyStones.size() == 0 ) return pass();
 		
 		System.out.println("this.enemyStones.size: " + this.enemyStones.size());
 		
@@ -254,7 +274,11 @@ public class Bot extends Player {
 		
 		System.out.println("bot possible moves size: "+possibleMoves.size());
 		for( int[][] moves: possibleMoves ) {
-			List< int[] > moveList = Arrays.asList( moves );
+			List< int[] > moveList = new ArrayList<int[]>();
+			for( int[] move: moves ) {
+				moveList.add(move);
+			}
+			
 			boolean finished = false;
 			Random RNG = new Random();
 			
@@ -275,13 +299,12 @@ public class Bot extends Player {
 				}
 			}
 			
-			if( finished ) return;
+			if( finished ) return false;
 		}
-		pass();
-		return;
+		return pass();
 	}
 	
-	public void makeMove() {
+	public boolean makeMove() {
 		int[] endangeredStone = getEndangeredStones();
 		
 		if( endangeredStone != null ) {
@@ -290,9 +313,9 @@ public class Bot extends Player {
 		}
 		if( endangeredStone == null ) {
 			System.out.println("bot attack");
-			attack();
+			return attack();
 		}
-		
+		return false;
 	}
 
 	public boolean interpretPlayerMove() {

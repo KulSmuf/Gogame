@@ -28,6 +28,8 @@ public class Board {
 	}
 	
 	public boolean pass() {
+		if( currentPlayer == 'W' ) currentPlayer = 'B';
+		else currentPlayer = 'W';
 		return !( pass = !pass );
 	}
 	
@@ -54,35 +56,6 @@ public class Board {
 			removeField( cords,r,c-1 );
 			// right
 			removeField( cords,r,c+1 );
-			
-			/*
-			if( r != 0 ) {
-				int nr = r-1;
-				int nc = c;
-				if( board[nr][nc] != 'E' ) stoneBoard[nr][nc].gainBreath();
-			}
-			
-			// down
-			if ( r != size-1 ) {
-				int nr = r+1;
-				int nc = c;
-				if( board[nr][nc] != 'E' ) stoneBoard[nr][nc].gainBreath();
-			}
-			
-			// left
-			if( c != 0 ) {
-				int nr = r;
-				int nc = c-1;
-				if( board[nr][nc] != 'E' ) stoneBoard[nr][nc].gainBreath();
-			}
-			
-			// right
-			if ( c != size-1 ) {
-				int nr = r;
-				int nc = c+1;
-				if( board[nr][nc] != 'E' ) stoneBoard[nr][nc].gainBreath();
-			}
-			*/
 		}
 	}
 	
@@ -96,7 +69,8 @@ public class Board {
 			else {
 				stoneBoard[nr][nc].getStoneChain().reduceBreath(cords);
 				if( board[nr][nc] == currentPlayer ) {
-					stoneChain[0] = stoneBoard[nr][nc].getStoneChain();
+					if( stoneChain[0] == null ) stoneChain[0] = stoneBoard[nr][nc].getStoneChain();
+					else stoneChain[0].merge(stoneBoard[nr][nc].getStoneChain());
 				}
 				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
 					if( ret[0].length() > 0 ) ret[0]+=" ";
@@ -113,6 +87,7 @@ public class Board {
 	}
 	
 	public String makeMove(int r, int c) {
+		System.out.println(" tura gracza: " + currentPlayer);
 		ko = null;
 		int[] cords = {r,c};
 		int[] newCords;
@@ -194,6 +169,16 @@ public class Board {
 	
 	public char getStoneColor( Stone stone ) {
 		return board[  stone.getRow() ][ stone.getColumn() ];
+	}
+	
+	public void getColor() {
+		for( int i=0;i<9;i++ ) {
+			for( int j=0;j<9;j++ ) {
+				System.out.print( board[j][i] );
+			}
+			System.out.print("\n");
+		}
+		System.out.print("\n");
 	}
 	
 	public void setMessage(String message) {
