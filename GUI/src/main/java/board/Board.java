@@ -70,7 +70,7 @@ public class Board {
 				stoneBoard[nr][nc].getStoneChain().reduceBreath(cords);
 				if( board[nr][nc] == currentPlayer ) {
 					if( stoneChain[0] == null ) stoneChain[0] = stoneBoard[nr][nc].getStoneChain();
-					else stoneChain[0].merge(stoneBoard[nr][nc].getStoneChain());
+					else if( !stoneChain[0].equals(stoneBoard[nr][nc].getStoneChain()) ) stoneChain[0].merge(stoneBoard[nr][nc].getStoneChain());
 				}
 				else if( stoneBoard[nr][nc].getStoneChain().getBreaths() == 0 ) {
 					if( ret[0].length() > 0 ) ret[0]+=" ";
@@ -87,7 +87,6 @@ public class Board {
 	}
 	
 	public String makeMove(int r, int c) {
-		System.out.println(" tura gracza: " + currentPlayer);
 		ko = null;
 		int[] cords = {r,c};
 		int[] newCords;
@@ -170,7 +169,7 @@ public class Board {
 	public char getStoneColor( Stone stone ) {
 		return board[  stone.getRow() ][ stone.getColumn() ];
 	}
-	
+	/*
 	public void getColor() {
 		for( int i=0;i<9;i++ ) {
 			for( int j=0;j<9;j++ ) {
@@ -181,7 +180,7 @@ public class Board {
 		}
 		System.out.print("\n");
 	}
-
+*/
 	public int[] getDirection( int[] A, int[] B ) {
 		return new int[] { B[0] - A[0], B[1] - A[1] };
 	}
@@ -365,7 +364,7 @@ public class Board {
 		int[] BeyeNum = new int[] {0};
 		int[] WeyeNum = new int[] {0};
 		
-		getColor();
+		//getColor();
 		
 		for( int i=0; i<board.length; i++ ) {
 			for( int j=0; j<board.length; j++ ) {
@@ -374,7 +373,7 @@ public class Board {
 			}
 		}
 		
-		getColor();
+		//getColor();
 		
 		boolean finish = false;
 		while( !finish ) {
@@ -384,7 +383,7 @@ public class Board {
 			}
 			finish = n == stoneChains.size();
 			
-			getColor();
+			//getColor();
 			
 			for( int i=0; i<board.length; i++ ) {
 				for( int j=0; j<board.length; j++ ) {
@@ -392,7 +391,7 @@ public class Board {
 				}
 			}
 			
-			getColor();
+			//getColor();
 			
 			BeyeNum = new int[] {0};
 			WeyeNum = new int[] {0};
@@ -401,7 +400,7 @@ public class Board {
 					if( board[i][j] == 'E' ) colorBoard( new int[] {i,j}, BeyeNum, WeyeNum );
 				}
 			}
-			getColor();
+			//getColor();
 		}
 		int Bscore = 0;
 		int Wscore = 0;

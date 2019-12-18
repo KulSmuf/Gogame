@@ -105,6 +105,6 @@ public class ClientServerCommunicationTest {
 		player1.sendCommand(move);
 		
 		while( !player2.hasServerSendCommand() );
-		assertEquals( "pass" , player2.getServerCommand());
+		assertEquals( "exit 0:0" , player2.getServerCommand());
 	}
 }

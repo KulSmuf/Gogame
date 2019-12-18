@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-import board.Board;
 import board.CompositeStone;
 import board.Stone;
 
@@ -85,7 +84,6 @@ public class Bot extends Player {
 				Stone neighbour = getStone( addVector( cords, direction ) );
 				if( neighbour == null ) breaths.add( addVector( cords, direction ) );
 				else if( board.getStoneColor( neighbour ) == 'W' ) {
-					System.out.println(" sąsiad good for cord: " + cords[0] + " " + cords[1] + " in " + neighbour.getRow() + " " + neighbour.getColumn() );
 					List<int[]> newBreaths = new ArrayList<int[]>();
 					for( int[] breath: neighbour.getStoneChain().getBreathArray() ) {
 						
@@ -107,8 +105,6 @@ public class Bot extends Player {
 	}
 	
 	public boolean tryProtect( int[] cords ) {
-		
-		System.out.println("try to protect");
 		
 		int[] possibleMove = getStone( cords ).getStoneChain().getBreathArray().get(0);
 		int breaths = checkNumberOfBreaths(possibleMove);
@@ -193,15 +189,8 @@ public class Bot extends Player {
 		for(int i=0 ; i<chains.length; i++ ) {
 			moves.addAll( chains[i].getBreathArray() );
 		}
-		System.out.println( " all chains breaths: " + moves.size() );
 		SortMovesByBreaths sort = new SortMovesByBreaths();
 		moves.sort(sort);
-		
-		System.out.print(" sorted moves: ");
-		for( int[] move: moves ) {
-			System.out.print(move[0] + " " + move[1] + " ");
-		}
-		System.out.println();
 		
 		return  splitByMostBreaths(moves);
 	}
@@ -283,15 +272,13 @@ public class Bot extends Player {
 	}
 	
 	public boolean attack() {
-		board.getColor();
+		//board.getColor();
 		
 		List< int[][] > possibleMoves = new ArrayList<int[][]>();
 		List< CompositeStone > enemyStones = new ArrayList<CompositeStone>();
 		
 		if( this.enemyStones.size() == 0 ) return pass();
-		
-		System.out.println("this.enemyStones.size: " + this.enemyStones.size());
-		
+				
 		for( int[] eCords: this.enemyStones ) {
 			boolean isIn = false;
 			for( CompositeStone stoneChain: enemyStones ) {
@@ -299,23 +286,16 @@ public class Bot extends Player {
 			}
 			if( !isIn ) enemyStones.add( getStone( eCords ).getStoneChain() );
 		}
-		
-		System.out.println("enemyStones.size: "+enemyStones.size());
-		
+				
 		SortByBreaths sort = new SortByBreaths();
 		enemyStones.sort(sort);
-		
-		System.out.println("enemyStones.size: "+enemyStones.size());
-		
+				
 		List< CompositeStone[] > weakChains = splitByLeastBreaths( enemyStones );
-		
-		System.out.println("weakChains.size: "+weakChains.size());
-		
+				
 		for( CompositeStone[] chains: weakChains ) {
 			possibleMoves.addAll( getMovesByBreaths(chains)  );
 		}
 		
-		System.out.println("bot possible moves size: "+possibleMoves.size());
 		for( int[][] moves: possibleMoves ) {
 			List< int[] > moveList = new ArrayList<int[]>();
 			for( int[] move: moves ) {
@@ -325,10 +305,8 @@ public class Bot extends Player {
 			boolean finished = false;
 			Random RNG = new Random();
 			
-			System.out.println("bot move size: " + moveList.size());
 			while( moveList.size() > 0 ) {
 				int n = RNG.nextInt( moveList.size() );
-				System.out.println(" bot possible moves: " + moves[n][0] + " " + moves[n][1] );
 				if( finished = board.checkCorrectness( moves[n][0] , moves[n][1]  ) ) {
 					String changes = board.makeMove( moves[n][0], moves[n][1] );
 					applyChanges( changes, moves[n] );
@@ -358,7 +336,6 @@ public class Bot extends Player {
 			if( !moved ) endangeredStone = null;
 		}
 		if( endangeredStone == null ) {
-			System.out.println("bot attack");
 			return attack();
 		}
 		return false;
