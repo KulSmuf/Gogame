@@ -41,12 +41,6 @@ import static org.mockito.Mockito.verify;
 	    	gui.makeMove("pass");
 	        verify(gui).makeMove("pass");
 	    }
-	    
-	    @Test
-	    public void test_makeMove2() {
-	    	gui.getTimer();
-	        assertTrue(gui.getTimer()!=null);
-	    }
 	}
 
 

@@ -39,7 +39,7 @@ public class panels {
 		//panel.addstone("7,7 0");
 		pan.turaPrzeciwnika();
 		assertTrue(pan.kogotura.isVisible());
-		assertTrue(pan.kogotura2.isVisible());
+		assertFalse(pan.kogotura2.isVisible());
 	}
 
 

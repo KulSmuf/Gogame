@@ -31,6 +31,11 @@ public class Exceptions {
 	    p.addstone("20,20");
 	}
 	
+	@Test(expected = Test.None.class)
+	public void shouldThrownException() {
+		gui.getClient();
+	}
+	
 	@Test
 	public void test_gui1() {
 	       assertNull(gui.getTimer());
@@ -44,6 +49,9 @@ public class Exceptions {
 		
 		
 	}
+	
+	
+
 	
 	
 	

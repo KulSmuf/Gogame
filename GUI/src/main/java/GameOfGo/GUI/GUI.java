@@ -204,7 +204,7 @@ public class GUI {
          }
          else {
         	points = score[1];
-        	points2 = score[2];
+        	points2 = score[0];
          }
          if(Integer.parseInt(points)>Integer.parseInt(points2)) {
         	 JOptionPane.showMessageDialog(getMFrame(),
