@@ -226,7 +226,8 @@ public class Bot extends Player {
 	
 	public boolean pass() {
 		if( board.pass() ) {
-			board.setMessage("exit 50:50");
+			String score = board.countTerritory();
+			board.setMessage(score);
 			synchronized( opponent.flag ) {
 				opponent.flag.notify();
 			}
