@@ -82,8 +82,8 @@ class Player implements Runnable {
 		else if ( clientCommand.compareTo("pass") == 0 ) {
 			boolean end = board.pass();
 			if( end ) {
-				board.setMessage("exit 50,50");
-				sendCommand("exit 50,50");
+				board.setMessage("exit 50:50");
+				sendCommand("exit 50:50");
 				synchronized( opponent.flag ) {
 					opponent.flag.notify();
 				}

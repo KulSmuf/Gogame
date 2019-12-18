@@ -181,6 +181,18 @@ public class Board {
 		System.out.print("\n");
 	}
 	
+	public String countTerritory() {
+		String ret = null;
+		
+		for( int i=0; i<board.length; i++ ) {
+			for( int j=0;j<board.length;j++ ) {
+				
+			}
+		}
+		
+		return ret;
+	}
+	
 	public void setMessage(String message) {
 		this.messageLog = message;
 	}

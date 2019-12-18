@@ -226,7 +226,7 @@ public class Bot extends Player {
 	
 	public boolean pass() {
 		if( board.pass() ) {
-			board.setMessage("exit 50,50");
+			board.setMessage("exit 50:50");
 			synchronized( opponent.flag ) {
 				opponent.flag.notify();
 			}
