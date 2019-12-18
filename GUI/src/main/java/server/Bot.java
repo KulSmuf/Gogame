@@ -258,7 +258,7 @@ public class Bot extends Player {
 		posMoves.sort(sort);
 		
 		for( int[] move: posMoves ) {
-			if( board.checkCorrectness( move[0],move[1] ) && checkNumberOfFree(move) > 2 ) {
+			if( board.checkCorrectness( move[0],move[1] ) && checkNumberOfFree(move) > 1 ) {
 				String changes = board.makeMove( move[0],move[1] );
 				applyChanges( changes, move );
 				synchronized( opponent.flag ) {
