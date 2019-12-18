@@ -119,7 +119,7 @@ public class MyPanel extends JPanel implements ActionListener{
 			Timer timer = new Timer();
 			TimerTask task = new coms_to_gui(this.gui);
 			Date date = new Date();
-			timer.scheduleAtFixedRate(task, date, 2000);
+			timer.scheduleAtFixedRate(task, date, 200);
 			gui.setTimer(timer);
 		}
 		else if(response.contains("exit")) {

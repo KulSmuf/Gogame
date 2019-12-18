@@ -196,16 +196,24 @@ public class GUI {
         else {
          String[] didyouwin = store.split(" ");
          String[] score = didyouwin[1].split(":");
-         String points = score[0];
-         String points2 = score[1];
+         String points;
+         String points2;
+         if(isWhichplayer()==false) {
+         points = score[0];
+         points2 = score[1];
+         }
+         else {
+        	points = score[1];
+        	points2 = score[2];
+         }
          if(Integer.parseInt(points)>Integer.parseInt(points2)) {
         	 JOptionPane.showMessageDialog(getMFrame(),
-         	        "Wygrałeś z wynikiem "+points+"do "+points2);
+         	        "Wygrałeś z wynikiem "+points+" do "+points2);
          	    	System.exit(0);
          }
          else {
         	 JOptionPane.showMessageDialog(getMFrame(),
-          	        "Przegrałeś z wynikiem "+points+"do "+points2);
+          	        "Przegrałeś z wynikiem "+points+" do "+points2);
           	    	System.exit(0);
          }
 	    }
