@@ -82,8 +82,8 @@ class Player implements Runnable {
 		else if ( clientCommand.compareTo("pass") == 0 ) {
 			boolean end = board.pass();
 			if( end ) {
-				board.setMessage("exit 50:50");
-				sendCommand("exit 50:50");
+				board.setMessage("exit 50,50");
+				sendCommand("exit 50,50");
 				synchronized( opponent.flag ) {
 					opponent.flag.notify();
 				}
@@ -149,7 +149,6 @@ class Player implements Runnable {
 		// configuration if pvp game
 		if( StartConfiguration[1].compareTo("p") == 0 ) {
 			
-			
 			synchronized(myServer.waitingPlayers) {
 				if( myServer.waitingPlayers.getWaitingPlayer(boardSize) == null ) myServer.waitingPlayers.addWaitingPlayer(this, boardSize);
 				else {
@@ -185,9 +184,15 @@ class Player implements Runnable {
 		}
 		else {
 			board = new Board( boardSize );
-			//opponent = new Bot();
+			opponent = new Bot();
 			(new Thread(opponent)).start();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			opponent.setOpponent(this, board);
+			sendCommand( Character.toString(color) );
 			startGame();
 		}
 	}
